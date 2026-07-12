@@ -1,0 +1,150 @@
+{
+  "projects": [
+    {
+      "id": "lms",
+      "slug": "lms",
+      "name": "Internship LMS (Ongoing)",
+      "summary": "A role-based Learning Management System (LMS) tailored for internship management, with Admin, Mentor, and Intern portals.",
+      "features": [
+        "Role-based dashboards for Admin, Mentor, and Intern",
+        "Session management with recordings and study material uploads",
+        "Attendance tracking and real-time session overview",
+        "Offer letter and certificate generation interface",
+        "Auth and data layer powered by Supabase"
+      ],
+      "image": "/projects/LMS.png",
+      "gitLink": "https://github.com/vedpatil1345/Intern-s-Learning-Management-System",
+      "demoLink": "https://iotechzved.vercel.app",
+      "techStack": ["Next.js", "Tailwind CSS", "Radix UI", "Supabase", "TypeScript", "Vercel"]
+    },
+    {
+      "id": "codetalk",
+      "slug": "codetalk",
+      "name": "CodeTalk",
+      "summary": "CodeTalk is a smart web app that uses AI (LLaMA 3.3 70B & Gemini) to assist developers with coding, debugging, and translating code.",
+      "features": [
+        "AI-powered code generation",
+        "Code & error analysis",
+        "Image to UI code via Gemini",
+        "Multilingual code translation",
+        "Voice command integration",
+        "Real-time suggestions & debugging"
+      ],
+      "image": "/projects/Codetalk.png",
+      "gitLink": "https://github.com/vedpatil1345/CodeTalk",
+      "demoLink": "https://codetalk-2.vercel.app",
+      "techStack": ["React", "TypeScript", "Groq(LLaMA 3.3 70B)", "Firebase", "Gemini API"]
+    },
+    {
+      "id": "cropcare",
+      "slug": "cropcare",
+      "name": "Cropcare",
+      "summary": "An AI-powered platform to support farmers with real-time crop disease detection, weather forecasts, and agriculture insights.",
+      "features": [
+        "AI chatbot with voice/text support in regional languages",
+        "Upload crop images to detect diseases using computer vision",
+        "Real-time location-based weather forecasts",
+        "Crop calendar with reminders",
+        "Track current market prices in local markets"
+      ],
+      "image": "/projects/crop.png",
+      "gitLink": "https://github.com/vedpatil1345/Crop-care",
+      "demoLink": "https://cropcare-1.vercel.app",
+      "techStack": ["Next.js", "Firebase", "Supabase", "Gemini API", "OpenWeatherMap API"]
+    },
+    {
+      "id": "alpha",
+      "slug": "alpha",
+      "name": "Alpha",
+      "summary": "An AI-powered interview preparation and simulation platform featuring Learning and Simulation phases.",
+      "features": [
+        "Learning Phase: Aptitude, Group Discussion (GD), and Personal Interview (PI) training",
+        "Simulation Phase: complete AI-led simulated interview pipeline",
+        "GD practice with real-time AI agents and speech feedback",
+        "PI prep with coding screen sharing and response analysis",
+        "Detailed performance dashboard and weak point detection"
+      ],
+      "image": "/projects/alpha.png",
+      "gitLink": "https://github.com/vedpatil1345/Ai-interview",
+      "demoLink": "https://ai-interview-indol.vercel.app/",
+      "techStack": ["Next.js", "Clerk", "Supabase", "Gemini API"]
+    },
+    {
+      "id": "mental-health-chatbot",
+      "slug": "mental-health-chatbot",
+      "name": "Mental Health Chatbot",
+      "summary": "Conversational AI designed to provide emotional support, coping tips, and resources for mental well-being.",
+      "features": [
+        "Real-time mental health conversation",
+        "Empathetic, non-judgmental AI responses",
+        "Provides coping strategies and stress/anxiety management advice",
+        "Privacy-focused text interactions"
+      ],
+      "image": "/projects/MentalBot.png",
+      "gitLink": "https://github.com/vedpatil1345/MentalHealthBot",
+      "demoLink": "https://mentalhealthbot-v.streamlit.app",
+      "techStack": ["Python", "Transformers", "LoRA", "Streamlit", "LangChain"]
+    },
+    {
+      "id": "e-plantshopping",
+      "slug": "e-plantshopping",
+      "name": "E-plantShopping",
+      "summary": "Online e-commerce platform for browsing, filtering, and ordering a variety of plants.",
+      "features": [
+        "Plant catalog with search, filters, and categories",
+        "Cart and order management features",
+        "Admin dashboard for product management",
+        "Secure login and signup integration"
+      ],
+      "image": "/projects/EPlantShoping.png",
+      "gitLink": "https://github.com/vedpatil1345/E-plantShopping",
+      "demoLink": "https://e-plantshopping-sand.vercel.app",
+      "techStack": ["React", "Tailwind CSS"]
+    },
+    {
+      "id": "webcapture",
+      "slug": "webcapture",
+      "name": "WebCapture",
+      "summary": "Streamlined web scraping tool designed to extract images and hyperlinks from web domains.",
+      "features": [
+        "Extracts images and links from individual pages and full domains",
+        "Customizable search and export options (CSV, JSON)",
+        "Built-in analytics for scraped pages"
+      ],
+      "image": "/projects/WebCapture.png",
+      "gitLink": "https://github.com/vedpatil1345/Web-Scrapper",
+      "demoLink": "https://web-scrapper-v.streamlit.app",
+      "techStack": ["Python", "BeautifulSoup", "Pandas", "Streamlit"]
+    },
+    {
+      "id": "portfolio-1",
+      "slug": "portfolio-1",
+      "name": "Developer Portfolio v1",
+      "summary": "Minimal and clean personal portfolio website presenting developer background and experience.",
+      "features": [
+        "Responsive, minimal presentation structure",
+        "Built using React and Tailwind CSS",
+        "Styled using shadcn/ui components"
+      ],
+      "image": "/projects/Portfolio-1.png",
+      "gitLink": "https://github.com/vedpatil1345/portfolio",
+      "demoLink": "https://vedpatil.vercel.app/",
+      "techStack": ["React", "Tailwind CSS", "shadcn/ui"]
+    },
+    {
+      "id": "portfolio-2",
+      "slug": "portfolio-2",
+      "name": "Developer Portfolio v2 (3D)",
+      "summary": "3D Interactive portfolio showcasing work experiences and skills using Three.js.",
+      "features": [
+        "3D animations and interactive models",
+        "Uses React Three Fiber (R3F) and Three.js",
+        "Responsive styling and custom overlays"
+      ],
+      "image": "/projects/Portfolio-2.png",
+      "gitLink": "https://github.com/vedpatil1345/3Js-Portfolio",
+      "demoLink": "https://ved-patil.vercel.app/",
+      "techStack": ["React", "Tailwind CSS", "Three.js", "React Three Fiber", "shadcn/ui"]
+    }
+  ]
+}

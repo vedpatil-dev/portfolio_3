@@ -1,0 +1,40 @@
+{
+  "chapters": [
+    {
+      "id": "about",
+      "number": 1,
+      "romanNumber": "I",
+      "title": "The Author",
+      "route": "/about",
+      "transition": "page-turn",
+      "spells": ["about", "education", "skills"]
+    },
+    {
+      "id": "projects",
+      "number": 2,
+      "romanNumber": "II",
+      "title": "Magical Artifacts",
+      "route": "/projects",
+      "transition": "page-turn",
+      "spells": []
+    },
+    {
+      "id": "experience",
+      "number": 3,
+      "romanNumber": "III",
+      "title": "The Chronicles Map",
+      "route": "/experience",
+      "transition": "diary-to-map",
+      "spells": []
+    },
+    {
+      "id": "contact",
+      "number": 4,
+      "romanNumber": "IV",
+      "title": "Send an Owl",
+      "route": "/contact",
+      "transition": "page-turn",
+      "spells": []
+    }
+  ]
+}

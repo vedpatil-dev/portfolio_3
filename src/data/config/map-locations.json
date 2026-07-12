@@ -1,0 +1,44 @@
+{
+  "locations": [
+    {
+      "id": "great-hall",
+      "name": "Great Hall",
+      "section": "about",
+      "route": "/about",
+      "x": 800,
+      "y": 450
+    },
+    {
+      "id": "observatory",
+      "name": "Observatory",
+      "section": "projects",
+      "route": "/projects",
+      "x": 800,
+      "y": 150
+    },
+    {
+      "id": "library",
+      "name": "Arcane Library",
+      "section": "skills",
+      "route": "/skills",
+      "x": 400,
+      "y": 450
+    },
+    {
+      "id": "clock-tower",
+      "name": "Clock Tower",
+      "section": "experience",
+      "route": "/experience",
+      "x": 1200,
+      "y": 450
+    },
+    {
+      "id": "owlery",
+      "name": "Owlery",
+      "section": "contact",
+      "route": "/contact",
+      "x": 800,
+      "y": 750
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "categories": [
+    {
+      "name": "Languages",
+      "skills": [
+        { "name": "JavaScript", "icon": "/assets/javascript.svg" },
+        { "name": "Python", "icon": "/assets/python.svg" },
+        { "name": "Java", "icon": "/assets/java.svg" },
+        { "name": "C/C++", "icon": "/assets/cpp.svg" }
+      ]
+    },
+    {
+      "name": "Frontend",
+      "skills": [
+        { "name": "React", "icon": "/assets/react.svg" },
+        { "name": "NextJs", "icon": "/assets/nextjs.svg" },
+        { "name": "Tailwind CSS", "icon": "/assets/tailwind.svg" }
+      ]
+    },
+    {
+      "name": "Backend & Database",
+      "skills": [
+        { "name": "Node.js", "icon": "/assets/nodejs.svg" },
+        { "name": "Express", "icon": "/assets/express.svg" },
+        { "name": "MySQL", "icon": "/assets/mysql.svg" },
+        { "name": "MongoDB", "icon": "/assets/mongodb.svg" },
+        { "name": "Firebase", "icon": "/assets/firebase.svg" }
+      ]
+    },
+    {
+      "name": "AI & Tools",
+      "skills": [
+        { "name": "TensorFlow", "icon": "/assets/tensorflow.svg" },
+        { "name": "Git", "icon": "/assets/git.svg" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "defaultTitle": "Ved Patil | Developer Portfolio",
+  "titleTemplate": "%s | Ved Patil Portfolio",
+  "defaultDescription": "A developer portfolio inspired by an ancient magical diary.",
+  "openGraph": {
+    "type": "website",
+    "locale": "en_US",
+    "siteName": "Ved Patil Portfolio"
+  }
+}
