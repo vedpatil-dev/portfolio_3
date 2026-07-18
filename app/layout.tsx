@@ -1,30 +1,27 @@
 import type { Metadata } from "next";
-import { EB_Garamond, IM_Fell_English_SC, Caveat } from "next/font/google";
+import { Caveat, Pirata_One } from "next/font/google";
 import "./globals.css";
 import CursorSerpent from "@/src/components/effects/CursorSerpent";
 
-const ebGaramond = EB_Garamond({
-  variable: "--font-eb-garamond",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const imFell = IM_Fell_English_SC({
-  variable: "--font-im-fell",
+// ── Pirate map font — headings, chapter titles, nav labels ──
+const pirataOne = Pirata_One({
+  variable: "--font-pirata",
   subsets: ["latin"],
   weight: ["400"],
+  display: "swap",
 });
 
+// ── Handwriting font — body text, notes, descriptions ──
 const caveat = Caveat({
   variable: "--font-caveat",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
-
 
 export const metadata: Metadata = {
   title: "Ved Patil | Developer Portfolio",
-  description: "A developer portfolio inspired by an ancient magical diary.",
+  description: "A full stack developer portfolio — built like an ancient pirate map.",
 };
 
 export default function RootLayout({
@@ -35,13 +32,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${ebGaramond.variable} ${imFell.variable} ${caveat.variable} h-full antialiased`}
+      className={`${pirataOne.variable} ${caveat.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <CursorSerpent />
+      <body className="flex flex-col">
+        
         {children}
       </body>
     </html>
   );
 }
-

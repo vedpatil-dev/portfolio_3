@@ -621,7 +621,7 @@ export default function CursorSerpent() {
     <div
       ref={containerRef}
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none z-[999]"
+      className="hidden lg:block fixed inset-0 pointer-events-none z-999"
       style={{
         opacity: 0,
         contain: "strict",

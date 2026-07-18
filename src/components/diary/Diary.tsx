@@ -129,17 +129,17 @@ export default function Diary({
   const nextChapter = currentChapterIndex < chapters.length - 1 ? chapters[currentChapterIndex + 1] : null;
 
   return (
-    <div className="h-screen w-screen bg-[#100b08] bg-[radial-gradient(circle_at_center,_#352216_0%,_#0b0705_100%)] text-ink font-serif flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 relative overflow-hidden select-none"
+    <div className="h-screen w-screen bg-[#100b08] bg-[radial-gradient(circle_at_center,#352216_0%,#0b0705_100%)] text-ink font-serif flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 relative overflow-hidden select-none"
       style={{ perspective: "1200px" }}
     >
       
       {/* Desk surface ambient glow beneath book */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-[radial-gradient(ellipse_at_50%_100%,_rgba(100,60,20,0.22)_0%,_transparent_70%)] pointer-events-none" />
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[85%] h-12 bg-[radial-gradient(ellipse_at_center,_rgba(0,0,0,0.7)_0%,_transparent_70%)] blur-sm pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-[radial-gradient(ellipse_at_50%_100%,rgba(100,60,20,0.22)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[85%] h-12 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.7)_0%,transparent_70%)] blur-sm pointer-events-none" />
 
       {/* Decorative Desk items / stains */}
-      <div className="absolute top-10 left-10 w-32 h-32 bg-[radial-gradient(circle,_rgba(118,53,46,0.1)_0%,_transparent_70%)] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-48 h-48 bg-[radial-gradient(circle,_rgba(150,115,49,0.05)_0%,_transparent_70%)] pointer-events-none" />
+      <div className="absolute top-10 left-10 w-32 h-32 bg-[radial-gradient(circle,rgba(118,53,46,0.1)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-48 h-48 bg-[radial-gradient(circle,rgba(150,115,49,0.05)_0%,transparent_70%)] pointer-events-none" />
 
       {/* 3D Scene Wrapper — tilts the book so it looks like it's on a desk */}
       <div
@@ -269,7 +269,7 @@ export default function Diary({
             {/* LEFT PAGE GROUP — shows stacked page edges on the left outer side */}
             <div className="relative flex-1 min-w-0 book-pages-left">
               {/* Subtle gradient to shade the left page edge inward */}
-              <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/10 to-transparent z-10 pointer-events-none rounded-l" />
+              <div className="absolute inset-y-0 left-0 w-4 bg-linear-to-r from-black/10 to-transparent z-10 pointer-events-none rounded-l" />
               <div className="w-full h-full bg-[#d6bd89] parchment-page parchment-stains flex flex-col p-4 md:p-6 lg:p-8 overflow-hidden justify-between" style={{ borderRadius: '2px 0 0 2px' }}>
 
               {/* Header */}
@@ -343,7 +343,7 @@ export default function Diary({
             {/* RIGHT PAGE GROUP — shows stacked page edges on the right outer side */}
             <div className="relative flex-1 min-w-0 book-pages-right">
               {/* Subtle gradient to shade the right page edge inward */}
-              <div className="absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-black/10 to-transparent z-10 pointer-events-none rounded-r" />
+              <div className="absolute inset-y-0 right-0 w-4 bg-linear-to-l from-black/10 to-transparent z-10 pointer-events-none rounded-r" />
               <div className="w-full h-full bg-[#d6bd89] parchment-page parchment-stains flex flex-col overflow-hidden p-4 md:p-6 lg:p-8 justify-between" style={{ borderRadius: '0 2px 2px 0' }}>
 
               

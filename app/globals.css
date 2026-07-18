@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #d6bd89;
+  --background: #c8a96e;
   --foreground: #21170f;
   
-  /* Magical Diary Color Palette */
+  /* Aged Rusted Map Color Palette */
   --parchment-light: #d6bd89;
   --parchment: #b9955b;
   --parchment-dark: #76532e;
@@ -15,6 +15,13 @@
   --leather-light: #51301e;
   --gold: #967331;
   --shadow: #100b08;
+  
+  /* Rust / aged metal tones */
+  --rust: #7a3b1e;
+  --rust-light: #a0522d;
+  --rust-dark: #4a1e0a;
+  --verdigris: #3d5a47;
+  --map-bg: #b8956a;
 }
 
 @theme {
@@ -28,173 +35,421 @@
   --color-leather-light: var(--leather-light);
   --color-gold: var(--gold);
   --color-shadow: var(--shadow);
+  --color-rust: var(--rust);
+  --color-rust-light: var(--rust-light);
+  --color-rust-dark: var(--rust-dark);
+  --color-verdigris: var(--verdigris);
+  --color-map-bg: var(--map-bg);
   
+  /* ── 2 fonts only ── */
+  /* Pirata One: pirate map style — all headings, titles, nav, chapter labels */
+  --font-display: var(--font-pirata), 'Times New Roman', serif;
+  /* Caveat: handwriting — all body text, descriptions, notes, inputs */
   --font-sans: var(--font-caveat), cursive;
   --font-mono: var(--font-caveat), cursive;
   --font-serif: var(--font-caveat), cursive;
-  --font-display: var(--font-caveat), cursive;
   --font-handwritten: var(--font-caveat), cursive;
 }
 
+/* ─── RUSTED MAP BACKGROUND ───────────────────────────────────────────────── */
+html, body {
+  min-height: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-handwritten), cursive;
-  font-size: 1.15rem;
+  /* Caveat is the default body / handwriting font */
+  font-family: var(--font-caveat), cursive;
+  font-size: 1.05rem;
+  background-color: #eed6b0;
+  /* Layered rusted map: bright center parchment glow + heavy rust spots + edge burn. */
+  background-image:
+    /* Parchment center glow fading to dark borders */
+    radial-gradient(circle at center, rgba(248, 230, 200, 0.92) 0%, rgba(214, 189, 137, 0.55) 45%, rgba(164, 129, 80, 0.30) 75%, rgba(12, 6, 3, 0.82) 100%),
+    /* Top-left rust bloom */
+    radial-gradient(circle at 8% 12%, rgba(100, 44, 18, 0.45) 0%, transparent 35%),
+    /* Bottom-right rust bloom */
+    radial-gradient(circle at 92% 88%, rgba(95, 40, 15, 0.40) 0%, transparent 32%),
+    /* Center-right rust patch */
+    radial-gradient(circle at 75% 40%, rgba(85, 35, 10, 0.28) 0%, transparent 25%),
+    /* Top-right corner water damage */
+    radial-gradient(circle at 88% 5%, rgba(90, 50, 15, 0.35) 0%, transparent 28%),
+    /* Left edge rust streak */
+    radial-gradient(ellipse at 0% 60%, rgba(100, 44, 18, 0.32) 0%, transparent 25%),
+    /* Bottom center darkening */
+    radial-gradient(ellipse at 50% 100%, rgba(35, 15, 5, 0.45) 0%, transparent 35%),
+    /* SVG paper grain noise */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='mapNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.3 0 0 0 0 0.12 0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23mapNoise)'/%3E%3C/svg%3E");
+  background-attachment: fixed;
 }
 
-/* Force handwriting globally on all text elements, forms, and buttons */
-*, *::before, *::after, input, textarea, button, select {
-  font-family: var(--font-handwritten), cursive !important;
-}
+/* ─── MAP SECTION LAYOUT ─────────────────────────────────────────────────── */
 
-/* Custom ambient styles for Cursor Serpent */
-.serpent-glow {
-  filter: drop-shadow(0 0 2px var(--gold));
-}
-
-.serpent-segment-animate {
-  animation: ink-drift 3s ease-in-out infinite alternate;
-}
-
-/* Old Paper / Parchment style with SVG grain filter */
-.parchment-page {
-  background-color: var(--parchment-light);
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.05)),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  box-shadow: 
-    0 2px 8px rgba(16, 11, 8, 0.2),
-    inset 0 0 40px rgba(118, 83, 46, 0.15);
-  border: 1px solid rgba(118, 83, 46, 0.3);
+/* Full-screen section slide */
+.map-section {
   position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   overflow: hidden;
 }
 
-/* Stacked page edges on the LEFT side of the open book (right page looking stack) */
-.book-pages-left {
+/* Content card on top of map bg — aged parchment card */
+.map-content-card {
   position: relative;
+  background-color: rgba(214, 189, 137, 0.82);
+  background-image:
+    radial-gradient(circle at 20% 25%, rgba(122, 59, 30, 0.07) 0%, transparent 35%),
+    radial-gradient(circle at 80% 75%, rgba(118, 83, 46, 0.09) 0%, transparent 30%),
+    radial-gradient(circle at 55% 10%, rgba(100, 70, 30, 0.06) 0%, transparent 20%);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(118, 83, 46, 0.4);
+  border-radius: 3px;
+  box-shadow:
+    0 4px 24px rgba(16, 11, 8, 0.35),
+    0 1px 4px rgba(16, 11, 8, 0.25),
+    inset 0 0 30px rgba(118, 83, 46, 0.10);
+  overflow: hidden;
 }
-.book-pages-left::before {
+
+/* Corner fold effect on cards */
+.map-content-card::after {
   content: '';
   position: absolute;
-  left: -2px;
-  top: 3px;
-  bottom: 3px;
-  width: 100%;
-  border-radius: 2px 0 0 2px;
-  background: linear-gradient(to right, #ede0c0, #e5d4aa);
-  box-shadow:
-    -2px 0 0 #e0d0a0,
-    -3px 0 0 #d8c890,
-    -4px 0 0 #d0c082,
-    -5px 0 0 #c8b875,
-    -6px 0 0 #c0b068,
-    -7px 0 0 #b8a85c,
-    -8px 0 0 #af9f50,
-    -9px 0 0 #a89648,
-    -10px 0 0 #a08d40,
-    -11px 0 0 #988438;
-  z-index: -1;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(225deg, rgba(89, 64, 43, 0.5) 0%, rgba(176, 145, 80, 0.3) 100%);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
   pointer-events: none;
 }
 
-/* Stacked page edges on the RIGHT side of the open book (left page looking stack) */
-.book-pages-right {
-  position: relative;
+/* ─── PIRATE MAP TOP NAVIGATION ─────────────────────────────────────────── */
+
+.map-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  
+  /* Aged parchment strip */
+  background-color: #d6bd89;
+  background-image:
+    radial-gradient(circle at 10% 50%, rgba(122, 59, 30, 0.25) 0%, transparent 35%),
+    radial-gradient(circle at 90% 50%, rgba(122, 59, 30, 0.25) 0%, transparent 35%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stripNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.5 0 0 0 0 0.35 0 0 0 0 0.15 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stripNoise)'/%3E%3C/svg%3E");
+  border-top: 2px solid rgba(89, 64, 43, 0.6);
+  box-shadow:
+    0 -4px 15px rgba(16, 11, 8, 0.35),
+    inset 0 2px 6px rgba(118, 83, 46, 0.2);
 }
-.book-pages-right::after {
+
+@media (min-width: 768px) {
+  .map-nav {
+    bottom: auto;
+    top: 0;
+    border-top: none;
+    border-bottom: 2px solid rgba(89, 64, 43, 0.6);
+    box-shadow:
+      0 4px 15px rgba(16, 11, 8, 0.35),
+      inset 0 -2px 6px rgba(118, 83, 46, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Torn bottom edge on nav */
+.map-nav::after {
   content: '';
   position: absolute;
-  right: -2px;
-  top: 3px;
-  bottom: 3px;
-  width: 100%;
-  border-radius: 0 2px 2px 0;
-  background: linear-gradient(to left, #ede0c0, #e5d4aa);
-  box-shadow:
-    2px 0 0 #e0d0a0,
-    3px 0 0 #d8c890,
-    4px 0 0 #d0c082,
-    5px 0 0 #c8b875,
-    6px 0 0 #c0b068,
-    7px 0 0 #b8a85c,
-    8px 0 0 #af9f50,
-    9px 0 0 #a89648,
-    10px 0 0 #a08d40,
-    11px 0 0 #988438;
-  z-index: -1;
+  top: -6px;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 7' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 Q10,7 20,3 Q30,0 40,5 Q50,7 60,2 Q70,0 80,4 Q90,7 100,1 Q110,0 120,6 Q130,7 140,2 Q150,0 160,5 Q170,7 180,1 Q190,0 200,4 Q210,7 220,2 Q230,0 240,6 Q250,7 260,3 Q270,0 280,5 Q290,7 300,1 Q310,0 320,4 Q330,7 340,2 Q350,0 360,5 Q370,7 380,3 Q390,0 400,4 L400,0 Z' fill='%23d6bd89'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  transform: rotate(180deg);
   pointer-events: none;
 }
 
-/* Aged parchment stains */
-.parchment-stains::before {
-  content: "";
+@media (min-width: 768px) {
+  .map-nav::after {
+    top: auto;
+    bottom: -6px;
+    transform: none;
+  }
+}
+
+/* SVG connector paths between nav icons */
+.nav-path-svg {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(118, 83, 46, 0.06) 0%, transparent 20%),
-    radial-gradient(circle at 80% 70%, rgba(118, 83, 46, 0.08) 0%, transparent 25%),
-    radial-gradient(circle at 50% 10%, rgba(118, 83, 46, 0.05) 0%, transparent 15%);
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  overflow: visible;
+}
+
+.nav-path-line {
+  fill: none;
+  stroke: var(--blood-ink);
+  stroke-width: 2.2;
+  stroke-dasharray: 5 6;
+  opacity: 0.8;
+  filter: drop-shadow(1px 1px 0px rgba(214, 189, 137, 0.4));
+}
+
+/* Nav location marker */
+.nav-location {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+  text-decoration: none;
   z-index: 1;
 }
 
-/* Leather Cover Border — 3D Book on Desk */
-.leather-cover {
-  background-color: var(--leather);
-  background-image: 
-    radial-gradient(ellipse at 30% 20%, var(--leather-light) 0%, var(--leather) 50%, var(--shadow) 100%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='leatherNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.15' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23leatherNoise)'/%3E%3C/svg%3E");
-  /* Realistic book shadow: deep base shadow + warm light reflection + ambient glow */
-  box-shadow: 
-    inset 0 0 40px rgba(0, 0, 0, 0.85),
-    inset -3px 0 12px rgba(0,0,0,0.6),
-    /* Page thickness edges — bottom right creates book depth */
-    6px 6px 0 #1a0e07,
-    7px 7px 0 #120b05,
-    8px 8px 0 #0d0804,
-    9px 9px 0 #090604,
-    /* Ground shadow cast on desk */
-    12px 24px 50px rgba(0, 0, 0, 0.85),
-    0 35px 70px rgba(0, 0, 0, 0.55),
-    0 4px 20px rgba(150, 115, 49, 0.08);
-  border: 3px solid var(--leather-light);
-  border-right: 4px solid #0d0804;
-  border-bottom: 4px solid #0d0804;
-  border-radius: 4px 10px 10px 4px;
-  /* Left spine feels thicker */
-  border-left: 10px solid #1c0e08;
+.nav-location:hover {
+  transform: translateY(-2px);
 }
 
-/* Spine Crease for Double Page layout */
-.spine-crease {
+.nav-location-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(118, 83, 46, 0.7);
+  background: rgba(214, 189, 137, 0.85);
+  font-size: 1.1rem;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 5px rgba(16, 11, 8, 0.25);
+}
+
+.nav-location.active .nav-location-icon {
+  background: rgba(214, 189, 137, 0.95);
+  border-color: var(--blood-ink);
+  box-shadow: 0 0 10px rgba(104, 29, 24, 0.45), 0 2px 5px rgba(16, 11, 8, 0.35);
+}
+
+.nav-location:hover .nav-location-icon {
+  background: rgba(226, 203, 160, 0.95);
+  border-color: var(--gold);
+  box-shadow: 0 0 6px rgba(150, 115, 49, 0.4);
+}
+
+.nav-location-label {
+  /* Pirata One: pirate map style labels */
+  font-family: var(--font-pirata), 'Times New Roman', serif;
+  font-size: 0.72rem;
+  color: var(--ink-faded);
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+  transition: color 0.2s ease;
+  line-height: 1.2;
+}
+
+.nav-location.active .nav-location-label {
+  color: var(--blood-ink);
+  font-weight: 700;
+}
+
+/* ─── COMMAND PALETTE ────────────────────────────────────────────────────── */
+
+.cmd-palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 11, 8, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18vh;
+}
+
+.cmd-palette-box {
+  width: 100%;
+  max-width: 540px;
+  background-color: #d0b07a;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(122, 59, 30, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(118, 83, 46, 0.10) 0%, transparent 35%);
+  border: 2px solid rgba(118, 83, 46, 0.6);
+  border-radius: 4px;
+  box-shadow:
+    0 24px 60px rgba(16, 11, 8, 0.65),
+    0 4px 12px rgba(16, 11, 8, 0.4),
+    inset 0 0 20px rgba(118, 83, 46, 0.08);
+  overflow: hidden;
+  animation: palette-drop 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes palette-drop {
+  from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+.cmd-palette-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  border-bottom: 1px solid rgba(118, 83, 46, 0.35);
+  font-family: var(--font-handwritten), cursive;
+  font-size: 1.4rem;
+  color: var(--ink);
+  padding: 16px 20px;
+  caret-color: var(--blood-ink);
+}
+
+.cmd-palette-input::placeholder {
+  color: rgba(89, 64, 43, 0.4);
+}
+
+.cmd-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: var(--font-handwritten), cursive;
+  font-size: 0.95rem;
+  color: var(--ink-faded);
+  transition: background 0.15s ease, color 0.15s ease;
+  border-bottom: 1px solid rgba(118, 83, 46, 0.12);
+}
+
+.cmd-palette-item:hover,
+.cmd-palette-item.highlighted {
+  background: rgba(150, 115, 49, 0.25);
+  color: var(--ink);
+}
+
+.cmd-palette-item-icon {
+  font-size: 1rem;
+  width: 22px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* ─── HERO SECTION ───────────────────────────────────────────────────────── */
+
+.hero-title-ink {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title-ink::after {
+  content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 40px;
-  transform: translateX(-50%);
-  background: linear-gradient(
-    to right,
-    rgba(0, 0, 0, 0.08) 0%,
-    rgba(0, 0, 0, 0.25) 30%,
-    rgba(0, 0, 0, 0.4) 50%,
-    rgba(0, 0, 0, 0.25) 70%,
-    rgba(0, 0, 0, 0.08) 100%
-  );
-  box-shadow: 
-    inset 1px 0 0 rgba(255, 255, 255, 0.05),
-    inset -1px 0 0 rgba(255, 255, 255, 0.05);
-  pointer-events: none;
-  z-index: 10;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: 0.6;
 }
 
+/* Compass rose decoration */
+.compass-rose {
+  animation: compass-slow-spin 60s linear infinite;
+  transform-origin: center;
+  opacity: 0.2;
+}
 
-/* Smoke Dissolve Animation */
+@keyframes compass-slow-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Ink fade-in animation */
+@keyframes ink-appear {
+  0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
+  100% { opacity: 1; clip-path: inset(0 0% 0 0); }
+}
+
+.ink-appear {
+  animation: ink-appear 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ─── SECTION CHAPTER HEADERS ────────────────────────────────────────────── */
+
+.chapter-header {
+  font-family: var(--font-display), serif;
+  color: var(--leather);
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.06em;
+}
+
+.chapter-header::before {
+  content: '✦';
+  font-family: var(--font-handwritten), cursive;
+  font-size: 0.7em;
+  color: var(--gold);
+  margin-right: 0.4em;
+  opacity: 0.8;
+}
+
+.chapter-header::after {
+  content: '✦';
+  font-family: var(--font-handwritten), cursive;
+  font-size: 0.7em;
+  color: var(--gold);
+  margin-left: 0.4em;
+  opacity: 0.8;
+}
+
+/* Decorative chapter separator line */
+.chapter-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--parchment-dark), var(--gold), var(--parchment-dark), transparent);
+  opacity: 0.5;
+  margin: 0.5rem 0 1.5rem;
+}
+
+/* ─── RUSTED MAP DECORATIVE ELEMENTS ─────────────────────────────────────── */
+
+/* Aged location pin dot */
+.map-pin-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--rust-light), var(--rust-dark));
+  border: 1.5px solid rgba(89, 64, 43, 0.6);
+  box-shadow: 0 0 4px rgba(122, 59, 30, 0.4);
+}
+
+/* Coordinate marks like on a real map */
+.map-coord-mark {
+  font-family: var(--font-handwritten), cursive;
+  font-size: 0.55rem;
+  color: rgba(89, 64, 43, 0.45);
+  letter-spacing: 0.05em;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ─── SMOKE DISSOLVE ─────────────────────────────────────────────────────── */
+
 @keyframes smoke-fade {
   0% {
     filter: blur(0px);
@@ -221,138 +476,164 @@ body {
   pointer-events: none;
 }
 
-/* ─── Leather Strap / Clasp ─────────────────────────────── */
-@keyframes strap-dangle {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  30%       { transform: translateX(3px) rotate(1.5deg); }
-  70%       { transform: translateX(-2px) rotate(-1deg); }
+/* ─── CURSOR SERPENT ─────────────────────────────────────────────────────── */
+
+.serpent-glow {
+  filter: drop-shadow(0 0 2px var(--gold));
 }
 
-@keyframes buckle-glow {
-  0%, 100% { filter: drop-shadow(0 0 2px rgba(150,115,49,0.4)); }
-  50%       { filter: drop-shadow(0 0 6px rgba(150,115,49,0.9)); }
+.serpent-segment-animate {
+  animation: ink-drift 3s ease-in-out infinite alternate;
 }
 
-.diary-strap {
-  position: absolute;
-  /* Sits 30% down from top, centered vertically on the strap loop */
-  top: 28%;
-  right: 0;
-  transform: translateX(50%);
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
+/* ── FONTS ──────────────────────────────────────────────────────────────── */
+/* Only 2 fonts used site-wide:                                              */
+/*   .font-display  → Pirata One (pirate map style)                         */
+/*   .font-handwritten / .font-serif / .font-sans → Caveat (handwriting)    */
 
-.diary-strap:hover {
-  transform: translateX(52%) scale(1.04);
-}
-
-/* The dangling leather tongue that hangs past the buckle */
-.diary-strap-tongue {
-  animation: strap-dangle 4s ease-in-out infinite;
-  transform-origin: top center;
-}
-
-.diary-strap-buckle {
-  animation: buckle-glow 3s ease-in-out infinite;
-}
-
-/* Tag dangling from the strap end */
-.diary-strap-tag {
-  animation: strap-dangle 5s ease-in-out 0.5s infinite;
-  transform-origin: top center;
-}
-
-
-/* Custom fonts custom colors */
 .font-serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-caveat), cursive;
 }
 .font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-pirata), 'Times New Roman', serif;
 }
 .font-handwritten {
-  font-family: var(--font-handwritten);
+  font-family: var(--font-caveat), cursive;
 }
 
-/* Custom Antique Ornate Scrollbar (Harry Potter Style) */
+/* ─── ANTIQUE SCROLLBAR ──────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: var(--parchment);
-  border-left: 1px solid rgba(118, 83, 46, 0.3);
-  box-shadow: inset 1px 0 3px rgba(16, 11, 8, 0.2);
+  background-color: rgba(155, 118, 65, 0.4);
+  border-left: 1px solid rgba(118, 83, 46, 0.25);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--parchment-dark);
-  background-image: linear-gradient(to right, var(--gold) 0%, var(--parchment-dark) 50%, var(--leather) 100%);
-  border: 2px solid var(--parchment);
+  background-image: linear-gradient(to bottom, var(--gold), var(--parchment-dark), var(--leather));
+  border: 2px solid rgba(155, 118, 65, 0.4);
   border-radius: 4px;
-  box-shadow: 
-    0 1px 2px rgba(16, 11, 8, 0.4),
-    inset 1px 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-image: linear-gradient(to right, var(--parchment-light) 0%, var(--gold) 50%, var(--parchment-dark) 100%);
+  background-image: linear-gradient(to bottom, var(--parchment-light), var(--gold), var(--parchment-dark));
 }
 
-/* Ornate Antique Arrow Buttons for Scrollbar Ends */
-::-webkit-scrollbar-button:single-button {
-  background-color: var(--gold);
-  display: block;
-  border: 1px solid var(--parchment-dark);
-  height: 14px;
-  width: 14px;
-  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+/* scrollbar-width / scrollbar-color: Firefox-only properties (no Safari support) */
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--parchment-dark) rgba(155, 118, 65, 0.3);
+  }
 }
 
-::-webkit-scrollbar-button:single-button:vertical:decrement {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 2 L1.5 7 L8.5 7 Z' fill='%2328170f'/%3E%3C/svg%3E");
-  background-size: 8px 8px;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-::-webkit-scrollbar-button:single-button:vertical:increment {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 8 L1.5 3 L8.5 3 Z' fill='%2328170f'/%3E%3C/svg%3E");
-  background-size: 8px 8px;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-::-webkit-scrollbar-button:single-button:horizontal:decrement {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 5 L7 1.5 L7 8.5 Z' fill='%2328170f'/%3E%3C/svg%3E");
-  background-size: 8px 8px;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-::-webkit-scrollbar-button:single-button:horizontal:increment {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 5 L3 1.5 L3 8.5 Z' fill='%2328170f'/%3E%3C/svg%3E");
-  background-size: 8px 8px;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Firefox compatibility */
-* {
-  scrollbar-width: auto;
-  scrollbar-color: var(--parchment-dark) var(--parchment);
-}
+/* ─── MISC UTILITIES ─────────────────────────────────────────────────────── */
 
 @keyframes ink-drift {
   0%, 100% { transform: scale(1) translate(0, 0); }
-  50% { transform: scale(1.05) translate(1px, -1px); }
+  50%       { transform: scale(1.05) translate(1px, -1px); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease forwards;
+}
+
+/* Skill tag */
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  background: rgba(150, 115, 49, 0.18);
+  border: 1px solid rgba(118, 83, 46, 0.35);
+  border-radius: 2px;
+  font-family: var(--font-handwritten), cursive;
+  font-size: 0.78rem;
+  color: var(--ink-faded);
+}
+
+/* Project artifact card */
+.artifact-card {
+  background-color: rgba(214, 189, 137, 0.7);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(122, 59, 30, 0.06) 0%, transparent 30%),
+    radial-gradient(circle at 85% 80%, rgba(118, 83, 46, 0.08) 0%, transparent 25%);
+  border: 1px solid rgba(118, 83, 46, 0.35);
+  border-radius: 3px;
+  box-shadow: 0 2px 12px rgba(16, 11, 8, 0.22), inset 0 0 16px rgba(118, 83, 46, 0.06);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.artifact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(16, 11, 8, 0.32);
+}
+
+/* Timeline line for experience */
+.timeline-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--rust), var(--gold), var(--rust), transparent);
+  opacity: 0.6;
 }
 
 
+
+/* Page transition area — padding for fixed nav responsive position */
+.page-content {
+  padding-top: 24px;
+  padding-bottom: 96px;
+  min-height: 100vh;
+}
+
+@media (min-width: 768px) {
+  .page-content {
+    padding-top: 90px;
+    padding-bottom: 24px;
+  }
+}
+
+/* ─── MAP OPENING PAGE TRANSITION ────────────────────────────────────────── */
+
+.page-unfold-container {
+  clip-path: inset(0 50% 0 50%);
+  transition: clip-path 0.85s cubic-bezier(0.25, 1, 0.45, 1);
+  will-change: clip-path;
+  position: relative;
+}
+
+.page-unfold-container.is-unfolded {
+  clip-path: inset(0 0% 0 0%);
+}
+
+/* Vertical center crease shadow simulating a folded parchment opening */
+.page-unfold-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 50px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 4s cubic-bezier(0.25, 1, 0.45, 1);
+}
+
+.page-unfold-container.is-unfolded::before {
+  opacity: 0;
+}
 

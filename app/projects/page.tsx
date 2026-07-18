@@ -1,143 +1,187 @@
 "use client";
 
-import React, { Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useState } from "react";
 import Link from "next/link";
-import Diary from "@/src/components/diary/Diary";
+import MapShell from "@/src/components/layout/MapShell";
 import projectsData from "@/src/data/content/projects.json";
+import { ExternalLink, ArrowRight } from "lucide-react";
+import { FaGithub as Github } from "react-icons/fa";
 
-interface Project {
-  id: string;
-  slug: string;
-  name: string;
-  summary: string;
-  features: string[];
-  image: string;
-  gitLink: string;
-  demoLink: string;
-  techStack: string[];
-}
-
-function ProjectsPageContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  
-  const search = searchParams.get("search") || "";
-  const projects: Project[] = projectsData.projects;
-
-  // Filter projects by search query if present
-  const filteredProjects = projects.filter((project) => {
-    if (!search) return true;
-    const query = search.toLowerCase();
-    return (
-      project.name.toLowerCase().includes(query) ||
-      project.summary.toLowerCase().includes(query) ||
-      project.techStack.some((tech) => tech.toLowerCase().includes(query))
-    );
-  });
-
-  const renderRightPageContent = () => {
-    return (
-      <div className="space-y-6 animate-fade-in select-text">
-        <div className="flex justify-between items-center border-b border-double border-parchment-dark/30 pb-2">
-          <h3 className="font-display text-2xl text-leather">
-            Chapter II: Magical Artifacts
-          </h3>
-          {search && (
-            <span className="font-handwritten text-sm text-blood-ink">
-              Filtered by: &apos;{search}&apos; (
-              <button 
-                onClick={() => router.push("/projects")}
-                className="underline hover:text-leather font-bold"
-              >
-                clear
-              </button>
-              )
-            </span>
-          )}
-        </div>
-
-        {filteredProjects.length === 0 ? (
-          <div className="text-center py-10 space-y-4">
-            <div className="font-handwritten text-3xl text-blood-ink">
-              No matching artifacts found.
-            </div>
-            <p className="font-serif text-sm text-ink-faded max-w-sm mx-auto">
-              No magical spells in our registry matches &quot;{search}&quot;. Try typing another keyword like <code className="bg-parchment-dark/10 px-1 py-0.5 rounded text-blood-ink font-mono text-xs">lms</code> or <code className="bg-parchment-dark/10 px-1 py-0.5 rounded text-blood-ink font-mono text-xs">AI</code>.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {filteredProjects.map((project) => (
-              <div 
-                key={project.id} 
-                className="bg-[#c5a671]/15 border border-parchment-dark/20 rounded p-4 space-y-3 shadow-sm hover:bg-[#c5a671]/25 hover:border-gold/50 transition-all duration-300 transform hover:-translate-y-0.5"
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <h4 className="font-display text-xl text-leather-light font-bold">
-                    {project.name}
-                  </h4>
-                  <span className="font-handwritten text-xs text-ink-faded font-bold tracking-wider uppercase border border-parchment-dark/30 px-1.5 py-0.5 rounded bg-parchment/10">
-                    ID: {project.id}
-                  </span>
-                </div>
-
-                <p className="font-serif text-sm text-ink-faded leading-relaxed">
-                  {project.summary}
-                </p>
-
-                {/* Tech Stack tags */}
-                <div className="flex flex-wrap gap-1">
-                  {project.techStack.map((tech, idx) => (
-                    <span 
-                      key={idx} 
-                      className="font-mono text-[10px] text-leather bg-parchment-dark/15 border border-parchment-dark/20 px-1.5 py-0.5 rounded-sm"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Navigation Link to detail page */}
-                <div className="flex justify-between items-center pt-2 border-t border-dotted border-parchment-dark/20">
-                  <span className="font-handwritten text-sm text-blood-ink">
-                    Spell code: {project.id}
-                  </span>
-                  <Link
-                    href={`/projects/${project.slug}`}
-                    className="font-display text-xs font-bold text-blood-ink hover:text-leather hover:underline tracking-wider uppercase"
-                  >
-                    Examine Artifact →
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="font-handwritten text-xl text-blood-ink text-center pt-4">
-          ~ Artifacts are items of power, crafted with code.
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <Diary
-      activeChapter="projects"
-      rightPageContent={renderRightPageContent()}
-    />
-  );
-}
+type Project = typeof projectsData.projects[0];
 
 export default function ProjectsPage() {
+  const [search, setSearch] = useState("");
+
+  const filtered = search.trim()
+    ? projectsData.projects.filter((p) => {
+        const q = search.toLowerCase();
+        return (
+          p.name.toLowerCase().includes(q) ||
+          p.summary.toLowerCase().includes(q) ||
+          p.techStack.some((t) => t.toLowerCase().includes(q))
+        );
+      })
+    : projectsData.projects;
+
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#100b08] flex items-center justify-center font-handwritten text-2xl text-[#d6bd89]">
-        Summoning Chapter II...
-      </div>
-    }>
-      <ProjectsPageContent />
-    </Suspense>
+    <MapShell>
+      <section className="map-section px-4 py-12 md:py-16" aria-labelledby="projects-title">
+        <div className="max-w-5xl w-full mx-auto space-y-10">
+
+          {/* Chapter header */}
+          <div className="text-center">
+            <p className="font-handwritten text-sm text-ink-faded tracking-widest mb-2 opacity-70">
+              Chapter IV
+            </p>
+            <h1 id="projects-title" className="chapter-header text-3xl md:text-4xl">
+              Projects
+            </h1>
+            <div className="chapter-divider w-48 mx-auto mt-2" />
+            <p className="font-handwritten text-base text-ink-faded italic mt-2 opacity-80">
+              Things I&apos;ve built — and the stories behind them
+            </p>
+          </div>
+
+          {/* Search */}
+          <div className="max-w-md mx-auto">
+            <div className="relative">
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name or technology…"
+                aria-label="Search projects"
+                className="w-full bg-transparent border border-dashed border-parchment-dark/40 focus:border-blood-ink focus:outline-none font-handwritten text-base text-blood-ink px-4 py-2 rounded-sm transition-colors"
+                style={{
+                  background: "rgba(214,189,137,0.5)",
+                  caretColor: "var(--blood-ink)",
+                }}
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 font-handwritten text-xs text-ink-faded hover:text-blood-ink transition-colors"
+                  aria-label="Clear search"
+                >
+                  ✕ clear
+                </button>
+              )}
+            </div>
+            {search && (
+              <p className="font-handwritten text-xs text-ink-faded mt-1 text-center">
+                {filtered.length} project{filtered.length !== 1 ? "s" : ""} found for &ldquo;{search}&rdquo;
+              </p>
+            )}
+          </div>
+
+          {/* Grid */}
+          {filtered.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="font-handwritten text-2xl text-blood-ink opacity-70">
+                No projects match your search.
+              </p>
+              <p className="font-handwritten text-sm text-ink-faded opacity-60 mt-1 italic">
+                Even the Marauder&apos;s Map had blank spots.
+              </p>
+              <button
+                onClick={() => setSearch("")}
+                className="mt-4 font-handwritten text-sm text-ink-faded underline hover:text-leather"
+              >
+                Clear search
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((project, i) => (
+                <article key={project.id} className="artifact-card flex flex-col">
+                  {/* Project image */}
+                  <div
+                    className="relative overflow-hidden"
+                    style={{ height: 160, background: "rgba(155,118,65,0.25)" }}
+                  >
+                    <img
+                      src={project.image}
+                      alt={`${project.name} preview`}
+                      className="w-full h-full object-cover opacity-80"
+                      style={{ mixBlendMode: "multiply" }}
+                      loading={i < 3 ? "eager" : "lazy"}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <div className="absolute top-2 left-3 font-handwritten text-xs text-ink-faded opacity-60">
+                      № {String(i + 1).padStart(2, "0")}
+                    </div>
+                  </div>
+
+                  {/* Card content */}
+                  <div className="flex flex-col flex-1 p-4 space-y-2">
+                    <h2 className="font-display text-lg text-leather font-bold leading-tight">
+                      {project.name}
+                    </h2>
+                    <p className="font-serif text-sm text-ink-faded leading-relaxed flex-1">
+                      {project.summary}
+                    </p>
+
+                    {/* Tech tags */}
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {project.techStack.slice(0, 4).map((t, ti) => (
+                        <span key={ti} className="skill-tag">{t}</span>
+                      ))}
+                      {project.techStack.length > 4 && (
+                        <span className="skill-tag opacity-60">+{project.techStack.length - 4}</span>
+                      )}
+                    </div>
+
+                    {/* Action row */}
+                    <div className="flex items-center justify-between pt-3 border-t border-parchment-dark/20">
+                      <div className="flex items-center gap-3">
+                        {project.gitLink && (
+                          <a
+                            href={project.gitLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 font-handwritten text-xs text-ink-faded hover:text-leather transition-colors"
+                            aria-label={`${project.name} GitHub`}
+                          >
+                            <Github className="w-3.5 h-3.5 shrink-0" />
+                            <span>GitHub</span>
+                          </a>
+                        )}
+                        {project.demoLink && (
+                          <a
+                            href={project.demoLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 font-handwritten text-xs text-ink-faded hover:text-leather transition-colors"
+                            aria-label={`${project.name} live demo`}
+                          >
+                            <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                            <span>Live Demo</span>
+                          </a>
+                        )}
+                      </div>
+                      <Link
+                        href={`/projects/${project.slug}`}
+                        className="font-display text-xs text-blood-ink hover:text-leather hover:underline tracking-wider uppercase transition-colors flex items-center gap-0.5"
+                      >
+                        <span>Details</span>
+                        <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="text-center pt-4">
+            <p className="font-handwritten text-base text-blood-ink/60 italic">
+              ~ Built with focus, curiosity, and too much coffee. ~
+            </p>
+          </div>
+
+        </div>
+      </section>
+    </MapShell>
   );
 }

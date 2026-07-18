@@ -67,18 +67,18 @@ export default function ExperienceMap({
       {/* Map Caption */}
       <div className="text-center mb-4">
         <h4 className="font-display text-xl text-leather font-bold tracking-wide">
-          The Path of Chronicles
+          The Path of Experience
         </h4>
         <p className="font-handwritten text-sm text-ink-faded">
-          Hover or click locations to read the wizard&apos;s deeds
+          Hover or click locations to view professional details
         </p>
       </div>
 
       {/* SVG Map Canvas */}
-      <div className="w-full relative aspect-[5/4] border border-parchment-dark/30 rounded bg-[#c5a671]/40 overflow-hidden shadow-inner p-2">
+      <div className="w-full relative aspect-5/4 border border-parchment-dark/30 rounded bg-[#c5a671]/40 overflow-hidden shadow-inner p-2">
         
         {/* Parchment background grain/lines specifically for map */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_40%,_rgba(118,83,46,0.15)_100%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(118,83,46,0.15)_100%)] pointer-events-none" />
 
         <svg
           viewBox="0 0 600 450"
@@ -102,19 +102,7 @@ export default function ExperienceMap({
             className="opacity-70"
           />
 
-          {/* SVG Map Grid Marks */}
-          <g stroke="#76532e" strokeWidth="0.5" className="opacity-15" fill="none">
-            <line x1="50" y1="0" x2="50" y2="450" />
-            <line x1="150" y1="0" x2="150" y2="450" />
-            <line x1="250" y1="0" x2="250" y2="450" />
-            <line x1="350" y1="0" x2="350" y2="450" />
-            <line x1="450" y1="0" x2="450" y2="450" />
-            <line x1="550" y1="0" x2="550" y2="450" />
-            <line x1="0" y1="100" x2="600" y2="100" />
-            <line x1="0" y1="200" x2="600" y2="200" />
-            <line x1="0" y1="300" x2="600" y2="300" />
-            <line x1="0" y1="400" x2="600" y2="400" />
-          </g>
+
 
           {/* SVG Sea Monster / Stained Art (decorative map details) */}
           <g transform="translate(100, 100)" className="opacity-20 select-none pointer-events-none font-handwritten text-xs fill-ink-faded">
