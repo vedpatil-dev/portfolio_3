@@ -2,12 +2,11 @@ import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Compass, Scroll, Wand2, Swords, Trophy, Feather } from "lucide-react";
+import { Compass, Scroll, Swords, Trophy, Feather } from "lucide-react";
 
 const NAV_LOCATIONS = [
   { id: "home", label: "Home", icon: <Compass className="w-5 h-5 text-ink-faded" />, route: "/" },
   { id: "about", label: "About", icon: <Scroll className="w-5 h-5 text-ink-faded" />, route: "/about" },
-  { id: "skills", label: "Skills", icon: <Wand2 className="w-5 h-5 text-ink-faded" />, route: "/skills" },
   { id: "experience", label: "Experience", icon: <Swords className="w-5 h-5 text-ink-faded" />, route: "/experience" },
   { id: "projects", label: "Projects", icon: <Trophy className="w-5 h-5 text-ink-faded" />, route: "/projects" },
   { id: "contact", label: "Contact", icon: <Feather className="w-5 h-5 text-ink-faded" />, route: "/contact" },

@@ -6,10 +6,26 @@ import projectsData from "@/src/data/content/projects.json";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { FaGithub as Github } from "react-icons/fa";
 
+import { Metadata } from "next";
+
 type Project = typeof projectsData.projects[0];
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const project = projectsData.projects.find((p) => p.slug === slug);
+  if (!project) {
+    return {
+      title: "Project Not Found | Ved Patil",
+    };
+  }
+  return {
+    title: `${project.name} | Projects | Ved Patil`,
+    description: project.summary,
+  };
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
@@ -48,13 +64,12 @@ export default async function ProjectDetailPage({ params }: Props) {
             {/* Project image */}
             <div
               className="relative overflow-hidden"
-              style={{ height: 240, background: "rgba(155,118,65,0.3)" }}
+              style={{ background: "rgba(155,118,65,0.3)" }}
             >
               <img
                 src={project.image}
                 alt={`${project.name} screenshot`}
-                className="w-full h-full object-cover opacity-80"
-                style={{ mixBlendMode: "multiply" }}
+                className="w-full object-cover opacity-70 hover:opacity-100 transition-opacity duration-500"
               />
             </div>
 

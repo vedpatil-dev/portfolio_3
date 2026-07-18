@@ -1,9 +1,25 @@
 {
   "projects": [
     {
+      "id": "conduit",
+      "slug": "conduit",
+      "name": "Conduit — CI/CD Visibility Platform (Ongoing)",
+      "summary": "A centralized dashboard for monitoring CI/CD pipelines and Docker container infrastructure in real time.",
+      "features": [
+        "Real-time CI/CD pipeline monitoring and visual dashboard telemetry",
+        "Deep Docker integration for tracking container logs, status, and health metrics",
+        "Secure role-based user authentication and access controls",
+        "Responsive, utility-first UI for cross-device pipeline monitoring"
+      ],
+      "image": "/projects/Conduit.png",
+      "gitLink": "https://github.com/vedpatil-dev/Conduit",
+      "demoLink": "",
+      "techStack": ["Spring Boot", "Next.js", "TypeScript", "Docker", "Tailwind CSS", "Java"]
+    },
+    {
       "id": "lms",
       "slug": "lms",
-      "name": "Internship LMS (Ongoing)",
+      "name": "Internship LMS",
       "summary": "A role-based Learning Management System (LMS) tailored for internship management, with Admin, Mentor, and Intern portals.",
       "features": [
         "Role-based dashboards for Admin, Mentor, and Intern",
@@ -13,7 +29,7 @@
         "Auth and data layer powered by Supabase"
       ],
       "image": "/projects/LMS.png",
-      "gitLink": "https://github.com/vedpatil1345/Intern-s-Learning-Management-System",
+      "gitLink": "https://github.com/vedpatil-dev/Intern-s-Learning-Management-System",
       "demoLink": "https://iotechzved.vercel.app",
       "techStack": ["Next.js", "Tailwind CSS", "Radix UI", "Supabase", "TypeScript", "Vercel"]
     },
@@ -31,7 +47,7 @@
         "Real-time suggestions & debugging"
       ],
       "image": "/projects/Codetalk.png",
-      "gitLink": "https://github.com/vedpatil1345/CodeTalk",
+      "gitLink": "https://github.com/vedpatil-dev/CodeTalk",
       "demoLink": "https://codetalk-2.vercel.app",
       "techStack": ["React", "TypeScript", "Groq(LLaMA 3.3 70B)", "Firebase", "Gemini API"]
     },
@@ -48,7 +64,7 @@
         "Track current market prices in local markets"
       ],
       "image": "/projects/crop.png",
-      "gitLink": "https://github.com/vedpatil1345/Crop-care",
+      "gitLink": "https://github.com/vedpatil-dev/Crop-care",
       "demoLink": "https://cropcare-1.vercel.app",
       "techStack": ["Next.js", "Firebase", "Supabase", "Gemini API", "OpenWeatherMap API"]
     },
@@ -65,7 +81,7 @@
         "Detailed performance dashboard and weak point detection"
       ],
       "image": "/projects/alpha.png",
-      "gitLink": "https://github.com/vedpatil1345/Ai-interview",
+      "gitLink": "https://github.com/vedpatil-dev/Ai-interview",
       "demoLink": "https://ai-interview-indol.vercel.app/",
       "techStack": ["Next.js", "Clerk", "Supabase", "Gemini API"]
     },
@@ -81,7 +97,7 @@
         "Privacy-focused text interactions"
       ],
       "image": "/projects/MentalBot.png",
-      "gitLink": "https://github.com/vedpatil1345/MentalHealthBot",
+      "gitLink": "https://github.com/vedpatil-dev/MentalHealthBot",
       "demoLink": "https://mentalhealthbot-v.streamlit.app",
       "techStack": ["Python", "Transformers", "LoRA", "Streamlit", "LangChain"]
     },
@@ -97,7 +113,7 @@
         "Secure login and signup integration"
       ],
       "image": "/projects/EPlantShoping.png",
-      "gitLink": "https://github.com/vedpatil1345/E-plantShopping",
+      "gitLink": "https://github.com/vedpatil-dev/E-plantShopping",
       "demoLink": "https://e-plantshopping-sand.vercel.app",
       "techStack": ["React", "Tailwind CSS"]
     },
@@ -112,7 +128,7 @@
         "Built-in analytics for scraped pages"
       ],
       "image": "/projects/WebCapture.png",
-      "gitLink": "https://github.com/vedpatil1345/Web-Scrapper",
+      "gitLink": "https://github.com/vedpatil-dev/Web-Scrapper",
       "demoLink": "https://web-scrapper-v.streamlit.app",
       "techStack": ["Python", "BeautifulSoup", "Pandas", "Streamlit"]
     },
@@ -127,7 +143,7 @@
         "Styled using shadcn/ui components"
       ],
       "image": "/projects/Portfolio-1.png",
-      "gitLink": "https://github.com/vedpatil1345/portfolio",
+      "gitLink": "https://github.com/vedpatil-dev/portfolio",
       "demoLink": "https://vedpatil.vercel.app/",
       "techStack": ["React", "Tailwind CSS", "shadcn/ui"]
     },
@@ -142,7 +158,7 @@
         "Responsive styling and custom overlays"
       ],
       "image": "/projects/Portfolio-2.png",
-      "gitLink": "https://github.com/vedpatil1345/3Js-Portfolio",
+      "gitLink": "https://github.com/vedpatil-dev/3Js-Portfolio",
       "demoLink": "https://ved-patil.vercel.app/",
       "techStack": ["React", "Tailwind CSS", "Three.js", "React Three Fiber", "shadcn/ui"]
     }

@@ -1,11 +1,18 @@
 {
-  "summary": "Full Stack Developer passionate about building interactive web applications, AI integrations, and XR experiences.",
+  "summary": "Computer Engineering graduate with hands-on experience in Full Stack Development, specializing in Spring Boot, React.js, and modern web technologies. Experienced in building scalable web applications, REST APIs, database design, and AI-powered applications.",
+  "bio": [
+    "I'm Ved Patil, a Full Stack Developer who enjoys building software and continuously learning how great products are designed and engineered.",
+    "My journey into software development started with a curiosity about how applications work behind the scenes. Over time, that curiosity evolved into a passion for creating reliable, scalable, and user-focused solutions.",
+    "Throughout my experience, I have worked across the frontend, backend, databases, deployment, and development workflows. More importantly, I have learned that software engineering is not just about writing code—it's about solving problems, collaborating with people, understanding requirements, and continuously improving through feedback and experience.",
+    "I enjoy exploring new technologies, optimizing existing solutions, and taking on challenges that push me to grow as a developer. Whether it's building features, debugging complex issues, improving performance, or learning a new concept, I see every project as an opportunity to become a better engineer.",
+    "Currently, I am focused on strengthening my expertise in full-stack development, software architecture, and building applications that create meaningful value for users."
+  ],
   "education": [
     {
-      "institution": "Your University/College",
-      "degree": "Bachelor of Technology in Computer Science",
-      "duration": "2022 - 2026",
-      "details": "Focused on software engineering, web technologies, and artificial intelligence."
+      "institution": "Madhuben And Bhanubhai Patel Institute of Technology",
+      "degree": "Bachelor of Technology in Computer Engineering",
+      "duration": "Jul 2022 – May 2026",
+      "details": "Focused on software engineering, web development, algorithms, and databases. CGPA: 8.32"
     }
   ]
 }

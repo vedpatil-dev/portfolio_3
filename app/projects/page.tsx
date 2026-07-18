@@ -1,6 +1,3 @@
-"use client";
-
-import React, { useState } from "react";
 import Link from "next/link";
 import MapShell from "@/src/components/layout/MapShell";
 import projectsData from "@/src/data/content/projects.json";
@@ -9,19 +6,14 @@ import { FaGithub as Github } from "react-icons/fa";
 
 type Project = typeof projectsData.projects[0];
 
-export default function ProjectsPage() {
-  const [search, setSearch] = useState("");
+import { Metadata } from "next";
 
-  const filtered = search.trim()
-    ? projectsData.projects.filter((p) => {
-        const q = search.toLowerCase();
-        return (
-          p.name.toLowerCase().includes(q) ||
-          p.summary.toLowerCase().includes(q) ||
-          p.techStack.some((t) => t.toLowerCase().includes(q))
-        );
-      })
-    : projectsData.projects;
+export const metadata: Metadata = {
+  title: "Projects | Ved Patil",
+  description: "Explore the software engineering projects, web applications, and tools built by Ved Patil.",
+};
+
+export default function ProjectsPage() {
 
   return (
     <MapShell>
@@ -41,58 +33,8 @@ export default function ProjectsPage() {
               Things I&apos;ve built — and the stories behind them
             </p>
           </div>
-
-          {/* Search */}
-          <div className="max-w-md mx-auto">
-            <div className="relative">
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or technology…"
-                aria-label="Search projects"
-                className="w-full bg-transparent border border-dashed border-parchment-dark/40 focus:border-blood-ink focus:outline-none font-handwritten text-base text-blood-ink px-4 py-2 rounded-sm transition-colors"
-                style={{
-                  background: "rgba(214,189,137,0.5)",
-                  caretColor: "var(--blood-ink)",
-                }}
-              />
-              {search && (
-                <button
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 font-handwritten text-xs text-ink-faded hover:text-blood-ink transition-colors"
-                  aria-label="Clear search"
-                >
-                  ✕ clear
-                </button>
-              )}
-            </div>
-            {search && (
-              <p className="font-handwritten text-xs text-ink-faded mt-1 text-center">
-                {filtered.length} project{filtered.length !== 1 ? "s" : ""} found for &ldquo;{search}&rdquo;
-              </p>
-            )}
-          </div>
-
-          {/* Grid */}
-          {filtered.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="font-handwritten text-2xl text-blood-ink opacity-70">
-                No projects match your search.
-              </p>
-              <p className="font-handwritten text-sm text-ink-faded opacity-60 mt-1 italic">
-                Even the Marauder&apos;s Map had blank spots.
-              </p>
-              <button
-                onClick={() => setSearch("")}
-                className="mt-4 font-handwritten text-sm text-ink-faded underline hover:text-leather"
-              >
-                Clear search
-              </button>
-            </div>
-          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((project, i) => (
+              {projectsData.projects.map((project, i) => (
                 <article key={project.id} className="artifact-card flex flex-col">
                   {/* Project image */}
                   <div
@@ -102,10 +44,8 @@ export default function ProjectsPage() {
                     <img
                       src={project.image}
                       alt={`${project.name} preview`}
-                      className="w-full h-full object-cover opacity-80"
-                      style={{ mixBlendMode: "multiply" }}
+                      className="w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity duration-500"
                       loading={i < 3 ? "eager" : "lazy"}
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                     />
                     <div className="absolute top-2 left-3 font-handwritten text-xs text-ink-faded opacity-60">
                       № {String(i + 1).padStart(2, "0")}
@@ -171,7 +111,6 @@ export default function ProjectsPage() {
                 </article>
               ))}
             </div>
-          )}
 
           {/* Footer */}
           <div className="text-center pt-4">

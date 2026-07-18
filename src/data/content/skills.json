@@ -1,37 +1,51 @@
 {
   "categories": [
     {
-      "name": "Languages",
+      "name": "Programming Languages",
       "skills": [
-        { "name": "JavaScript", "icon": "/assets/javascript.svg" },
-        { "name": "Python", "icon": "/assets/python.svg" },
         { "name": "Java", "icon": "/assets/java.svg" },
-        { "name": "C/C++", "icon": "/assets/cpp.svg" }
+        { "name": "JavaScript", "icon": "/assets/javascript.svg" },
+        { "name": "TypeScript", "icon": "/assets/typescript.svg" },
+        { "name": "Python", "icon": "/assets/python.svg" },
+        { "name": "SQL", "icon": "/assets/sql.svg" }
       ]
     },
     {
-      "name": "Frontend",
+      "name": "Frontend Skills",
       "skills": [
-        { "name": "React", "icon": "/assets/react.svg" },
-        { "name": "NextJs", "icon": "/assets/nextjs.svg" },
-        { "name": "Tailwind CSS", "icon": "/assets/tailwind.svg" }
+        { "name": "React.js", "icon": "/assets/react.svg" },
+        { "name": "Next.js", "icon": "/assets/nextjs.svg" },
+        { "name": "Material UI (MUI)", "icon": "/assets/mui.svg" },
+        { "name": "Tailwind CSS", "icon": "/assets/tailwind.svg" },
+        { "name": "TanStack", "icon": "/assets/tanstack.svg" },
+        { "name": "Zustand", "icon": "/assets/zustand.svg" }
       ]
     },
     {
-      "name": "Backend & Database",
+      "name": "Backend Skills",
       "skills": [
+        { "name": "Spring Boot", "icon": "/assets/springboot.svg" },
         { "name": "Node.js", "icon": "/assets/nodejs.svg" },
-        { "name": "Express", "icon": "/assets/express.svg" },
-        { "name": "MySQL", "icon": "/assets/mysql.svg" },
+        { "name": "Express.js", "icon": "/assets/express.svg" },
+        { "name": "REST APIs", "icon": "/assets/restapi.svg" }
+      ]
+    },
+    {
+      "name": "Database Skills",
+      "skills": [
+        { "name": "PostgreSQL", "icon": "/assets/postgresql.svg" },
         { "name": "MongoDB", "icon": "/assets/mongodb.svg" },
+        { "name": "Supabase", "icon": "/assets/supabase.svg" },
         { "name": "Firebase", "icon": "/assets/firebase.svg" }
       ]
     },
     {
-      "name": "AI & Tools",
+      "name": "DevOps & Tools",
       "skills": [
-        { "name": "TensorFlow", "icon": "/assets/tensorflow.svg" },
-        { "name": "Git", "icon": "/assets/git.svg" }
+        { "name": "Git & GitHub", "icon": "/assets/git.svg" },
+        { "name": "Docker", "icon": "/assets/docker.svg" },
+        { "name": "Jenkins", "icon": "/assets/jenkins.svg" },
+        { "name": "Vercel / Render", "icon": "/assets/vercel.svg" }
       ]
     }
   ]

@@ -9,7 +9,7 @@ import { Home as HomeIcon, User as UserIcon, BookOpen, Briefcase, FolderGit2, Ma
 const COMMANDS = [
   { id: "home",        label: "Home",           icon: <HomeIcon className="w-4 h-4" />, route: "/" },
   { id: "about",       label: "About",           icon: <UserIcon className="w-4 h-4" />, route: "/about" },
-  { id: "skills",      label: "Skills",          icon: <BookOpen className="w-4 h-4" />, route: "/skills" },
+  { id: "skills",      label: "Skills",          icon: <BookOpen className="w-4 h-4" />, route: "/about#skills" },
   { id: "experience",  label: "Experience",      icon: <Briefcase className="w-4 h-4" />,  route: "/experience" },
   { id: "projects",    label: "Projects",        icon: <FolderGit2 className="w-4 h-4" />, route: "/projects" },
   { id: "contact",     label: "Contact",         icon: <Mail className="w-4 h-4" />, route: "/contact" },

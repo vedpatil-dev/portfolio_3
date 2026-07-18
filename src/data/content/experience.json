@@ -1,30 +1,47 @@
 {
   "entries": [
     {
+      "id": "emgage",
+      "company": "Emgage HRMS",
+      "role": "Full Stack Developer Intern",
+      "duration": "Sep 2025 - Present",
+      "summary": "Developing enterprise-grade HRMS modules using Spring Boot, React.js, and PostgreSQL.",
+      "animation": "salute",
+      "icon": "/emgage.png",
+      "description": [
+        "Developed and maintained enterprise HRMS modules for client organizations",
+        "Built dynamic, responsive frontends using React.js and Material UI (MUI) components",
+        "Developed robust backend web services and business logic utilizing Spring Boot framework",
+        "Designed and integrated secure REST APIs for seamless frontend-backend communication",
+        "Worked extensively with PostgreSQL databases, designing schemas and optimizing SQL queries for performance",
+        "Maintained codebase version control, performed testing, and resolved production bugs"
+      ],
+      "skills": ["Spring Boot", "React.js", "PostgreSQL", "REST APIs", "Material UI (MUI)", "Java"]
+    },
+    {
       "id": "elecon",
       "company": "Tech Elecon Pvt. Ltd.",
-      "role": "Frontend Developer Intern",
+      "role": "React.js Intern",
       "duration": "May 2025 - Jun 2025",
-      "summary": "Contributed to full-stack web development projects using modern frontend frameworks and deployment tools.",
-      "animation": "salute",
+      "summary": "Developed a Learning Management System (LMS) and code compiler using React.js.",
+      "animation": "clapping",
       "icon": "/elecon.png",
       "description": [
-        "Built responsive and performant web interfaces using React, Vite, Tailwind CSS, and Radix UI",
-        "Developed and deployed a code execution platform using React, Monaco Editor, Redux-Toolkit, and Node.js with Piston API integration",
-        "Worked on a role-based Learning Management System (LMS) using Next.js and Supabase for authentication and data handling",
-        "Integrated real-time session tracking, attendance view, and certificate generation features in LMS dashboard",
-        "Collaborated with teams and mentor to understand business requirements and translate them into technical solutions",
-        "Deployed applications using GitHub Pages, Vercel, and Render for optimized production performance"
+        "Developed a custom Learning Management System (LMS) designed for intern training and tracking",
+        "Built an interactive Online Code Compiler tool integrated directly within the platform web interface",
+        "Integrated backend REST APIs for real-time compilation, data persistence, and session management",
+        "Implemented secure application routing and page navigation using React Router",
+        "Designed and optimized responsive UI layouts for varying viewport sizes"
       ],
-      "skills": ["React", "Vite", "Tailwind CSS", "Next.js", "Supabase", "Node.js", "Piston API"]
+      "skills": ["React.js", "React Router", "REST APIs", "JavaScript", "HTML/CSS"]
     },
     {
       "id": "1m1b",
       "company": "1M1B Foundation",
-      "role": "AI & XR Intern",
+      "role": "GenAI Intern",
       "duration": "Sep 2024 - Nov 2024",
-      "summary": "Contributed to AI and XR solutions to support inclusive, real-world applications for social impact.",
-      "animation": "clapping",
+      "summary": "Developed Generative AI solutions and LLM-powered applications.",
+      "animation": "victory",
       "icon": "/1m1b.png",
       "description": [
         "Worked on projects powered by Large Language Models (LLMs), including a mental health support chatbot and a real-time news summarizer",

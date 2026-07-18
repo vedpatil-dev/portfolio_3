@@ -7,6 +7,13 @@ import { Mail, FileText } from "lucide-react";
 import { FaGithub as Github, FaLinkedin as Linkedin } from 'react-icons/fa'
 import ThemeLogo from "@/src/components/layout/ThemeLogo";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About | Ved Patil",
+  description: "Learn more about Ved Patil's background, education, skills, and full stack development journey.",
+};
+
 export default function AboutPage() {
   return (
     <MapShell>
@@ -42,7 +49,15 @@ export default function AboutPage() {
               <div className="flex-1 text-center sm:text-left space-y-2">
                 <h2 className="font-display text-2xl text-leather">{profileData.name}</h2>
                 <p className="font-handwritten text-xl text-gold/90 italic">{profileData.title}</p>
-                <p className="font-serif text-base text-ink-faded leading-relaxed">{aboutData.summary}</p>
+                <div className="font-serif text-base text-ink-faded leading-relaxed space-y-4 pt-2">
+                  {aboutData.bio ? (
+                    aboutData.bio.map((p: string, idx: number) => (
+                      <p key={idx}>{p}</p>
+                    ))
+                  ) : (
+                    <p>{aboutData.summary}</p>
+                  )}
+                </div>
 
 
               </div>
@@ -54,9 +69,25 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Two-column: Education + Skills */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Unified Skills Section */}
+          <div id="skills" className="map-content-card p-6 md:p-8 scroll-mt-24">
+            <h2 className="font-display text-2xl text-leather mb-4 border-b border-parchment-dark/25 pb-2">
+              Skills & Technology
+            </h2>
+            <div className="flex flex-wrap gap-2 md:gap-3 justify-center py-4">
+              {skillsData.categories.flatMap((cat) => cat.skills).map((skill, index) => (
+                <span 
+                  key={index} 
+                  className="skill-tag px-3.5 py-2 font-serif text-sm border border-parchment-dark/30 bg-parchment-light/35 text-leather rounded-sm transition-all duration-200 hover:scale-105 hover:bg-parchment-light/60 cursor-default"
+                >
+                  {skill.name}
+                </span>
+              ))}
+            </div>
+          </div>
 
+          {/* Two-column: Education + Contact & Resume */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Education */}
             <div className="map-content-card p-6">
               <h2 className="font-display text-xl text-leather mb-4 border-b border-parchment-dark/25 pb-2">
@@ -79,28 +110,15 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Skills snapshot */}
-            <div className="map-content-card p-6">
-              <h2 className="font-display text-xl text-leather mb-4 border-b border-parchment-dark/25 pb-2">
-                Core Skills
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                {skillsData.categories.map((cat, i) => (
-                  <div key={i} className="space-y-1">
-                    <h3 className="font-handwritten text-xs uppercase tracking-widest text-blood-ink font-bold opacity-80">
-                      {cat.name}
-                    </h3>
-                    <div className="flex flex-wrap gap-1">
-                      {cat.skills.map((s, j) => (
-                        <span key={j} className="skill-tag">{s.name}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Resume link */}
-              <div className="mt-5 pt-4 border-t border-parchment-dark/20">
+            {/* Resume & Documents download inside this card */}
+            <div className="map-content-card p-6 flex flex-col justify-between">
+              <div>
+                <h2 className="font-display text-xl text-leather mb-4 border-b border-parchment-dark/25 pb-2">
+                  Documents
+                </h2>
+                <p className="font-serif text-sm text-ink-faded leading-relaxed mb-4">
+                  Examine the author's complete parchment summary for academic credentials, operational records, and professional history.
+                </p>
                 <a
                   href={profileData.resumeUrl}
                   download
@@ -110,8 +128,8 @@ export default function AboutPage() {
                   <span>Download Resume</span>
                 </a>
               </div>
+              </div>
             </div>
-          </div>
 
           {/* Contact / Social links */}
           <div className="map-content-card p-6">

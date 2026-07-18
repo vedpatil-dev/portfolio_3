@@ -1,6 +1,3 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import MapShell from "@/src/components/layout/MapShell";
 import profileData from "@/src/data/content/profile.json";
@@ -10,12 +7,6 @@ import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
 import ThemeLogo from "@/src/components/layout/ThemeLogo";
 
 export default function Home() {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 100);
-    return () => clearTimeout(t);
-  }, []);
-
   return (
     <MapShell>
       {/* ── HERO SECTION ─────────────────────────────────────────────── */}
@@ -52,14 +43,7 @@ export default function Home() {
         />
 
         {/* ── MAIN HERO CONTENT ── */}
-        <div
-          className="relative z-10 max-w-2xl mx-auto px-6"
-          style={{
-            opacity: visible ? 1 : 0,
-            transform: visible ? "translateY(0)" : "translateY(16px)",
-            transition: "opacity 0.9s ease, transform 0.9s ease",
-          }}
-        >
+        <div className="relative z-10 max-w-2xl mx-auto px-6 opacity-0 translate-y-4 animate-map-fade-in">
           {/* Themed Magic Logo - responsive scale (larger on mobile) */}
           <div className="flex justify-center mb-4">
             <ThemeLogo className="w-28 h-28 sm:w-24 sm:h-24 md:w-20 md:h-20" />
