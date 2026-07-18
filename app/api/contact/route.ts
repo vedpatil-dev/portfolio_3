@@ -1,8 +1,60 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import nodemailer from "nodemailer";
+
+// In-memory rate limiting configuration
+interface RateLimitRecord {
+  timestamps: number[];
+}
+
+const rateLimitMap = new Map<string, RateLimitRecord>();
+const LIMIT = 3; // max requests
+const WINDOW_MS = 3 * 60 * 1000; // 3 minutes window
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  // Periodic pruning if memory map grows too large
+  if (rateLimitMap.size > 1000) {
+    for (const [key, val] of rateLimitMap.entries()) {
+      val.timestamps = val.timestamps.filter((t) => now - t < WINDOW_MS);
+      if (val.timestamps.length === 0) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+
+  if (!record) {
+    rateLimitMap.set(ip, { timestamps: [now] });
+    return false;
+  }
+
+  // Filter timestamps within the current window
+  record.timestamps = record.timestamps.filter((t) => now - t < WINDOW_MS);
+
+  if (record.timestamps.length >= LIMIT) {
+    return true;
+  }
+
+  record.timestamps.push(now);
+  return false;
+}
 
 export async function POST(request: Request) {
   try {
+    // Rate Limiting Check
+    const headersList = await headers();
+    const forwardedFor = headersList.get("x-forwarded-for");
+    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
+
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: "Too many owls sent. Please wait a few minutes before sending another." },
+        { status: 429 }
+      );
+    }
+
     const { name, email, message } = await request.json();
 
     // Basic Validation

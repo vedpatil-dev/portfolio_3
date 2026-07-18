@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Send, CheckCircle } from "lucide-react";
 
 export default function ContactForm() {
@@ -12,6 +12,28 @@ export default function ContactForm() {
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  // Load remaining cooldown on mount
+  useEffect(() => {
+    const expiryStr = localStorage.getItem("owl_cooldown_expiry");
+    if (expiryStr) {
+      const expiry = parseInt(expiryStr, 10);
+      const remaining = Math.ceil((expiry - Date.now()) / 1000);
+      if (remaining > 0) {
+        setCooldown(remaining);
+      }
+    }
+  }, []);
+
+  // Tick down cooldown timer
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,7 +41,7 @@ export default function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || cooldown > 0) return;
 
     setStatus("Sending...");
     setIsSubmitting(true);
@@ -36,10 +58,23 @@ export default function ContactForm() {
       const data = await response.json();
 
       if (response.ok) {
+        // Set success cooldown (60 seconds)
+        const cooldownTime = 60;
+        const expiry = Date.now() + cooldownTime * 1000;
+        localStorage.setItem("owl_cooldown_expiry", expiry.toString());
+        setCooldown(cooldownTime);
+
         setStatus("Message Sent Successfully!");
         setFormData({ name: "", email: "", message: "" });
         setSent(true);
       } else {
+        // Set rate-limit cooldown (180 seconds) if 429 received
+        if (response.status === 429) {
+          const cooldownTime = 180;
+          const expiry = Date.now() + cooldownTime * 1000;
+          localStorage.setItem("owl_cooldown_expiry", expiry.toString());
+          setCooldown(cooldownTime);
+        }
         setStatus(data.error || "Failed to send message. Please try again.");
       }
     } catch (error) {
@@ -137,12 +172,18 @@ export default function ContactForm() {
       <div className="text-center pt-2">
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || cooldown > 0}
           className="px-8 py-3.5 font-display text-sm tracking-wider text-leather border-2 border-parchment-dark/70 hover:border-gold rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg flex items-center gap-2 mx-auto cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ background: "rgba(150, 115, 49, 0.35)" }}
         >
           <Send className="w-4 h-4 shrink-0" />
-          <span>{isSubmitting ? "Sending..." : "Send the Owl"}</span>
+          <span>
+            {isSubmitting
+              ? "Sending..."
+              : cooldown > 0
+              ? `Owl Resting (${cooldown}s)`
+              : "Send the Owl"}
+          </span>
         </button>
 
         {status && !sent && (
