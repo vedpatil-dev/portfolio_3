@@ -8,6 +8,7 @@ interface InteractiveParagraphProps {
   className?: string;  // Styling for the outer wrapper
   fontClass?: string;  // Styling for the text inside, e.g. "font-handwritten text-lg text-ink-faded"
   fontSpec?: string;   // Font spec for canvas measurement, e.g. "18px Caveat"
+  lineHeight?: number; // Optional lineHeight (for backward compatibility)
 }
 
 interface WordInfo {
@@ -23,6 +24,7 @@ export default function InteractiveParagraph({
   className = "",
   fontClass = "font-handwritten text-lg text-ink-faded leading-relaxed",
   fontSpec = "18px Caveat, cursive",
+  lineHeight = 26, // Kept for prop conformance
 }: InteractiveParagraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [layoutKey, setLayoutKey] = useState(0);
