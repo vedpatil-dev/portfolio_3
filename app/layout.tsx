@@ -3,6 +3,8 @@ import { Caveat, Pirata_One } from "next/font/google";
 import "./globals.css";
 import CursorSerpent from "@/src/components/effects/CursorSerpent";
 import Preloader from "@/src/components/layout/Preloader";
+import { Analytics } from "@vercel/analytics/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // ── Pirate map font — headings, chapter titles, nav labels ──
 const pirataOne = Pirata_One({
@@ -65,9 +67,14 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex flex-col">
+      <body className="flex flex-col unselectable">
         <Preloader />
         {children}
+        <Analytics />
+        <CursorSerpent />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   );

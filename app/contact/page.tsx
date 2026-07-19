@@ -3,6 +3,7 @@ import socialData from "@/src/data/content/social.json";
 import { Mail } from "lucide-react";
 import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
 import ContactForm from "@/src/components/contact/ContactForm";
+import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 
 import { Metadata } from "next";
 
@@ -19,16 +20,21 @@ export default function ContactPage() {
 
           {/* Chapter header */}
           <div className="text-center">
-            <p className="font-handwritten text-sm text-ink-faded tracking-widest mb-2 opacity-70">
+            <p className="chapter-number">
               Chapter VI
             </p>
             <h1 id="contact-title" className="chapter-header text-3xl md:text-4xl">
               Contact
             </h1>
             <div className="chapter-divider w-40 mx-auto mt-2" />
-            <p className="font-handwritten text-base text-ink-faded italic mt-2 opacity-80">
-              Let&apos;s work together
-            </p>
+            <div className="mt-2 flex justify-center w-full">
+              <InteractiveParagraph
+                text="Let's work together"
+                fontClass="font-handwritten text-base text-ink-faded italic text-center"
+                fontSpec="16px Caveat, cursive"
+                lineHeight={22}
+              />
+            </div>
           </div>
 
           {/* Contact card */}

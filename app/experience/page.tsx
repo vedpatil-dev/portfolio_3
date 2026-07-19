@@ -1,6 +1,7 @@
 import MapShell from "@/src/components/layout/MapShell";
 import experienceData from "@/src/data/content/experience.json";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -36,16 +37,21 @@ export default function ExperiencePage() {
 
           {/* Chapter header */}
           <div className="text-center">
-            <p className="font-handwritten text-sm text-ink-faded tracking-widest mb-2 opacity-70">
+            <p className="chapter-number">
               Chapter III
             </p>
             <h1 id="exp-title" className="chapter-header text-3xl md:text-4xl">
               The Chronicles
             </h1>
             <div className="chapter-divider w-56 mx-auto mt-2" />
-            <p className="font-handwritten text-base text-ink-faded italic mt-2 opacity-80">
-              A winding path through professional milestones and training rooms
-            </p>
+            <div className="mt-2 flex justify-center w-full">
+              <InteractiveParagraph
+                text="A winding path through professional milestones and training rooms"
+                fontClass="font-handwritten text-base text-ink-faded italic text-center"
+                fontSpec="16px Caveat, cursive"
+                lineHeight={22}
+              />
+            </div>
           </div>
 
           {/* Journey Timeline Map Wrapper */}

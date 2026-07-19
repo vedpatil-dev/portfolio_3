@@ -5,6 +5,7 @@ import MapShell from "@/src/components/layout/MapShell";
 import projectsData from "@/src/data/content/projects.json";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { FaGithub as Github } from "react-icons/fa";
+import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 
 import { Metadata } from "next";
 
@@ -50,7 +51,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
           {/* Chapter header */}
           <div className="text-center">
-            <p className="font-handwritten text-sm text-ink-faded tracking-widest mb-2 opacity-70">
+            <p className="chapter-number">
               Artifact Record
             </p>
             <h1 id="project-detail-title" className="chapter-header text-2xl md:text-3xl">
@@ -75,9 +76,12 @@ export default async function ProjectDetailPage({ params }: Props) {
 
             <div className="p-6 md:p-8 space-y-6">
               {/* Summary */}
-              <p className="font-serif text-base text-ink-faded leading-relaxed">
-                {project.summary}
-              </p>
+              <InteractiveParagraph
+                text={project.summary}
+                fontClass="font-serif text-base text-ink-faded leading-relaxed"
+                fontSpec="16px Caveat, cursive"
+                lineHeight={24}
+              />
 
               {/* Features */}
               <div>

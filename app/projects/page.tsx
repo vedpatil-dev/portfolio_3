@@ -3,6 +3,7 @@ import MapShell from "@/src/components/layout/MapShell";
 import projectsData from "@/src/data/content/projects.json";
 import { ExternalLink, ArrowRight } from "lucide-react";
 import { FaGithub as Github } from "react-icons/fa";
+import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 
 type Project = typeof projectsData.projects[0];
 
@@ -22,16 +23,21 @@ export default function ProjectsPage() {
 
           {/* Chapter header */}
           <div className="text-center">
-            <p className="font-handwritten text-sm text-ink-faded tracking-widest mb-2 opacity-70">
+            <p className="chapter-number">
               Chapter IV
             </p>
             <h1 id="projects-title" className="chapter-header text-3xl md:text-4xl">
               Projects
             </h1>
             <div className="chapter-divider w-48 mx-auto mt-2" />
-            <p className="font-handwritten text-base text-ink-faded italic mt-2 opacity-80">
-              Things I&apos;ve built — and the stories behind them
-            </p>
+            <div className="mt-2 flex justify-center w-full">
+              <InteractiveParagraph
+                text="Things I've built — and the stories behind them"
+                fontClass="font-handwritten text-base text-ink-faded italic text-center"
+                fontSpec="16px Caveat, cursive"
+                lineHeight={22}
+              />
+            </div>
           </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projectsData.projects.map((project, i) => (

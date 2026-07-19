@@ -399,6 +399,15 @@ body {
 
 /* ─── SECTION CHAPTER HEADERS ────────────────────────────────────────────── */
 
+.chapter-number {
+  font-family: var(--font-handwritten), cursive;
+  font-size: 0.875rem;
+  color: var(--ink);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  opacity: 0.95;
+}
+
 .chapter-header {
   font-family: var(--font-display), serif;
   color: var(--leather);
@@ -598,7 +607,11 @@ body {
   opacity: 0.6;
 }
 
-
+* {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none;     /* IE 10 and Edge */
+  user-select: none;         /* Standard syntax (Chrome, Firefox, Opera) */
+}
 
 /* Page transition area — padding for fixed nav responsive position */
 .page-content {

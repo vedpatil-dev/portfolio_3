@@ -535,6 +535,11 @@ export default function CursorSerpent() {
       updateBodyPositions(deltaTime);
       renderSegments();
 
+      if (typeof window !== "undefined") {
+        (window as any).__serpentPositions = positionsRef.current;
+        (window as any).__serpentOpacity = opacityRef.current;
+      }
+
       animationFrameRef.current =
         requestAnimationFrame(animate);
     };
@@ -614,6 +619,10 @@ export default function CursorSerpent() {
 
       animationFrameRef.current = null;
       isAnimatingRef.current = false;
+
+      if (typeof window !== "undefined") {
+        (window as any).__serpentOpacity = 0;
+      }
     };
   }, []);
 

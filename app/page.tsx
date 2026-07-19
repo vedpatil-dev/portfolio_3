@@ -5,6 +5,7 @@ import socialData from "@/src/data/content/social.json";
 import { Mail } from "lucide-react";
 import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
 import ThemeLogo from "@/src/components/layout/ThemeLogo";
+import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 
 export default function Home() {
   return (
@@ -76,9 +77,14 @@ export default function Home() {
           </p>
 
           {/* Tagline */}
-          <p className="font-handwritten text-lg text-ink font-semibold italic mb-8 leading-relaxed">
-            &ldquo;{profileData.tagline}&rdquo;
-          </p>
+          <div className="mb-8 flex justify-center w-full">
+            <InteractiveParagraph
+              text={`“${profileData.tagline}”`}
+              fontClass="font-handwritten text-lg text-ink font-semibold italic text-center leading-relaxed"
+              fontSpec="18px Caveat, cursive"
+              lineHeight={26}
+            />
+          </div>
 
           {/* CTA buttons */}
           <div className="flex flex-wrap items-center justify-center gap-4 mt-2">

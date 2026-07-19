@@ -6,6 +6,7 @@ import socialData from "@/src/data/content/social.json";
 import { Mail, FileText } from "lucide-react";
 import { FaGithub as Github, FaLinkedin as Linkedin } from 'react-icons/fa'
 import ThemeLogo from "@/src/components/layout/ThemeLogo";
+import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 
 import { Metadata } from "next";
 
@@ -22,7 +23,7 @@ export default function AboutPage() {
 
           {/* Chapter header */}
           <div className="text-center">
-            <p className="font-handwritten text-sm text-ink-faded tracking-widest mb-2 opacity-70">
+            <p className="chapter-number">
               Chapter I
             </p>
             <h1 id="about-title" className="chapter-header text-3xl md:text-4xl">
@@ -49,13 +50,24 @@ export default function AboutPage() {
               <div className="flex-1 text-center sm:text-left space-y-2">
                 <h2 className="font-display text-2xl text-leather">{profileData.name}</h2>
                 <p className="font-handwritten text-xl text-gold/90 italic">{profileData.title}</p>
-                <div className="font-serif text-base text-ink-faded leading-relaxed space-y-4 pt-2">
+                <div className="space-y-4 pt-2">
                   {aboutData.bio ? (
                     aboutData.bio.map((p: string, idx: number) => (
-                      <p key={idx}>{p}</p>
+                      <InteractiveParagraph
+                        key={idx}
+                        text={p}
+                        fontClass="font-serif text-base text-ink-faded leading-relaxed"
+                        fontSpec="16px Caveat, cursive"
+                        lineHeight={24}
+                      />
                     ))
                   ) : (
-                    <p>{aboutData.summary}</p>
+                    <InteractiveParagraph
+                      text={aboutData.summary}
+                      fontClass="font-serif text-base text-ink-faded leading-relaxed"
+                      fontSpec="16px Caveat, cursive"
+                      lineHeight={24}
+                    />
                   )}
                 </div>
 
@@ -64,9 +76,14 @@ export default function AboutPage() {
             </div>
 
             {/* Subtle HP quote */}
-            <p className="font-handwritten text-lg text-blood-ink/60 text-center pt-6 italic">
-              ~ &ldquo;It is our choices that show what we truly are, far more than our abilities.&rdquo;
-            </p>
+            <div className="pt-6 flex justify-center w-full">
+              <InteractiveParagraph
+                text='~ “It is our choices that show what we truly are, far more than our abilities.”'
+                fontClass="font-handwritten text-lg text-blood-ink/70 text-center italic"
+                fontSpec="18px Caveat, cursive"
+                lineHeight={26}
+              />
+            </div>
           </div>
 
           {/* Unified Skills Section */}
