@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDiaryMachine } from "./useDiaryMachine";
 import DiaryBook from "./DiaryBook";
 import projectsData from "@/src/data/content/projects.json";
@@ -32,14 +32,39 @@ const COMMANDS = [
     label: `Project: ${p.name}`,
     icon: <Folder className="w-4 h-4" />,
     route: `/projects/${p.slug}`,
+    tags: p.techStack,
   })),
   ...experienceData.entries.map((e) => ({
     id: e.id,
     label: `Experience: ${e.company}`,
     icon: <Book className="w-4 h-4" />,
     route: `/experience#${e.id}`,
+    tags: e.skills,
   })),
 ];
+
+// Precomputed normalized search index for faster query filtering
+const SEARCH_INDEX = {
+  projects: projectsData.projects.map((p) => ({
+    ...p,
+    normalizedName: p.name.toLowerCase(),
+    normalizedSummary: p.summary.toLowerCase(),
+    normalizedTechStack: p.techStack.map((t) => t.toLowerCase()),
+  })),
+  experiences: experienceData.entries.map((e) => ({
+    ...e,
+    normalizedCompany: e.company.toLowerCase(),
+    normalizedRole: e.role.toLowerCase(),
+    normalizedSummary: e.summary.toLowerCase(),
+    normalizedDescription: e.description.map((d) => d.toLowerCase()),
+  })),
+  skills: skillsData.categories.flatMap((cat) =>
+    cat.skills.map((s) => ({
+      name: s.name,
+      normalizedName: s.name.toLowerCase(),
+    }))
+  ),
+};
 
 interface DiaryProps {
   open: boolean;
@@ -49,6 +74,7 @@ interface DiaryProps {
 export default function Diary({ open, onClose }: DiaryProps) {
   const { phase, transitionTo } = useDiaryMachine("closed");
   const [query, setQuery] = useState("");
+  const overlayRef = useRef<HTMLDivElement>(null);
   const [answer, setAnswer] = useState<any | null>(null);
   const [highlighted, setHighlighted] = useState(0);
 
@@ -79,7 +105,8 @@ export default function Diary({ open, onClose }: DiaryProps) {
     ? COMMANDS.filter(
         (c) =>
           c.label.toLowerCase().includes(query.toLowerCase()) ||
-          c.id.toLowerCase().includes(query.toLowerCase())
+          c.id.toLowerCase().includes(query.toLowerCase()) ||
+          (c as any).tags?.some((t: string) => t.toLowerCase().includes(query.toLowerCase()))
       )
     : COMMANDS;
 
@@ -135,37 +162,32 @@ export default function Diary({ open, onClose }: DiaryProps) {
         } else if (["contact", "owl", "email", "reach"].includes(q)) {
           setAnswer({ title: "Send an Owl", type: "contact" });
         } else {
-          const matchedProjects = projectsData.projects.filter(
+          const matchedProjects = SEARCH_INDEX.projects.filter(
             (p) =>
-              p.name.toLowerCase().includes(q) ||
-              p.summary.toLowerCase().includes(q) ||
-              p.techStack.some((t) => t.toLowerCase().includes(q))
+              p.normalizedName.includes(q) ||
+              p.normalizedSummary.includes(q) ||
+              p.normalizedTechStack.some((t) => t.includes(q))
           );
 
-          const matchedExperiences = experienceData.entries.filter(
+          const matchedExperiences = SEARCH_INDEX.experiences.filter(
             (e) =>
-              e.company.toLowerCase().includes(q) ||
-              e.role.toLowerCase().includes(q) ||
-              e.summary.toLowerCase().includes(q) ||
-              e.description.some((d) => d.toLowerCase().includes(q))
+              e.normalizedCompany.includes(q) ||
+              e.normalizedRole.includes(q) ||
+              e.normalizedSummary.includes(q) ||
+              e.normalizedDescription.some((d) => d.includes(q))
           );
 
-          const matchedSkills: string[] = [];
-          skillsData.categories.forEach((cat) => {
-            cat.skills.forEach((s) => {
-              if (s.name.toLowerCase().includes(q) && !matchedSkills.includes(s.name)) {
-                matchedSkills.push(s.name);
-              }
-            });
-          });
+          const matchedSkills = SEARCH_INDEX.skills
+            .filter((s) => s.normalizedName.includes(q))
+            .map((s) => s.name);
 
           if (matchedProjects.length > 0 || matchedExperiences.length > 0 || matchedSkills.length > 0) {
             setAnswer({
               title: `Search matches for "${query}"`,
               type: "search_results",
               results: {
-                projects: matchedProjects,
-                experiences: matchedExperiences,
+                projects: matchedProjects.map(({ normalizedName, normalizedSummary, normalizedTechStack, ...p }) => p),
+                experiences: matchedExperiences.map(({ normalizedCompany, normalizedRole, normalizedSummary, normalizedDescription, ...e }) => e),
                 skills: matchedSkills,
               },
             });
@@ -220,6 +242,7 @@ export default function Diary({ open, onClose }: DiaryProps) {
 
   return (
     <div
+      ref={overlayRef}
       className="diary-overlay active"
       role="dialog"
       aria-modal="true"
@@ -227,8 +250,8 @@ export default function Diary({ open, onClose }: DiaryProps) {
         if (e.target === e.currentTarget) handleCloseTrigger();
       }}
       style={{
-        transition: "opacity 0.8s ease-in-out",
-        opacity: phase === "appearing" || phase === "closing" ? 0 : 1,
+        transition: phase === "closing" ? "none" : "opacity 0.5s ease-in-out",
+        opacity: phase === "closing" ? undefined : 1,
       }}
     >
       {/* ── Overlay Close Button ── */}
@@ -255,6 +278,7 @@ export default function Diary({ open, onClose }: DiaryProps) {
           highlighted={highlighted}
           setHighlighted={setHighlighted}
           handleKeyDown={handleKeyDown}
+          overlayRef={overlayRef}
         />
       </div>
     </div>

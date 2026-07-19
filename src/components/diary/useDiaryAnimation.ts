@@ -23,6 +23,8 @@ interface UseDiaryAnimationProps {
   isFlipping: boolean;
   setIsFlipping: (val: boolean) => void;
   flipDirection: "forward" | "backward" | null;
+  onPageTurnMidpoint?: () => void;
+  overlayRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function useDiaryAnimation({
@@ -38,6 +40,8 @@ export function useDiaryAnimation({
   isFlipping,
   setIsFlipping,
   flipDirection,
+  onPageTurnMidpoint,
+  overlayRef,
 }: UseDiaryAnimationProps) {
   const currentTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
@@ -94,7 +98,7 @@ export function useDiaryAnimation({
           scaleY: 0.96,
           scaleX: 1.02,
           rotationX: 8,
-          duration: 0.25,
+          duration: 0.18,
           ease: "power2.out",
         })
         .to(book, {
@@ -102,7 +106,7 @@ export function useDiaryAnimation({
           scaleY: 1,
           scaleX: 1,
           rotationX: 12,
-          duration: 0.45,
+          duration: 0.35,
           ease: "elastic.out(1, 0.6)",
         });
         break;
@@ -133,6 +137,7 @@ export function useDiaryAnimation({
         currentTimelineRef.current = animatePageFlip(
           flipPage,
           flipDirection === "forward",
+          onPageTurnMidpoint,
           () => {
             setIsFlipping(false);
             transitionTo(flipDirection === "forward" ? "answer" : "waiting");
@@ -143,17 +148,25 @@ export function useDiaryAnimation({
 
       case "closing": {
         const pages = [leftPage, rightPage].filter(Boolean) as HTMLElement[];
-        currentTimelineRef.current = animateBookClosing(book, coverLeft!, lock, pages, () => {
-          onCloseComplete();
-          transitionTo("closed");
-        });
+        // Play close animation and then tell parent to unmount
+        currentTimelineRef.current = animateBookClosing(
+          book,
+          coverLeft!,
+          lock,
+          pages,
+          overlayRef.current,
+          () => {
+            transitionTo("closed");
+            onCloseComplete();
+          }
+        );
         break;
       }
 
       default:
         break;
     }
-  }, [phase, transitionTo, bookRef, coverLeftRef, lockRef, leftPageRef, rightPageRef, flippingPageRef, isFlipping, flipDirection, setIsFlipping, onCloseComplete]);
+  }, [phase, transitionTo, bookRef, coverLeftRef, lockRef, leftPageRef, rightPageRef, flippingPageRef, isFlipping, flipDirection, setIsFlipping, onCloseComplete, onPageTurnMidpoint]);
 
   // Idle page movement / breathing effect when waiting
   useEffect(() => {

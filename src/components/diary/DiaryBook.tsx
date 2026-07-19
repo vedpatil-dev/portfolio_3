@@ -26,6 +26,7 @@ interface DiaryBookProps {
   highlighted: number;
   setHighlighted: (idx: number) => void;
   handleKeyDown: (e: React.KeyboardEvent) => void;
+  overlayRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export default function DiaryBook({
@@ -41,6 +42,7 @@ export default function DiaryBook({
   highlighted,
   setHighlighted,
   handleKeyDown,
+  overlayRef,
 }: DiaryBookProps) {
   // DOM Refs for GSAP
   const bookRef = useRef<HTMLDivElement>(null);
@@ -54,6 +56,46 @@ export default function DiaryBook({
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState<"forward" | "backward" | null>(null);
   const [greetingFading, setGreetingFading] = useState(false);
+
+  // Timer & Callback Refs
+  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const typingDelayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const greetingFadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const greetingWaitingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pageTurnCallbackRef = useRef<(() => void) | null>(null);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+      if (typingDelayTimeoutRef.current) clearTimeout(typingDelayTimeoutRef.current);
+      if (greetingFadeTimeoutRef.current) clearTimeout(greetingFadeTimeoutRef.current);
+      if (greetingWaitingTimeoutRef.current) clearTimeout(greetingWaitingTimeoutRef.current);
+    };
+  }, []);
+
+  // Clear timers when phase changes to closing or closed
+  useEffect(() => {
+    if (phase === "closing" || phase === "closed") {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = null;
+      }
+      if (typingDelayTimeoutRef.current) {
+        clearTimeout(typingDelayTimeoutRef.current);
+        typingDelayTimeoutRef.current = null;
+      }
+      if (greetingFadeTimeoutRef.current) {
+        clearTimeout(greetingFadeTimeoutRef.current);
+        greetingFadeTimeoutRef.current = null;
+      }
+      if (greetingWaitingTimeoutRef.current) {
+        clearTimeout(greetingWaitingTimeoutRef.current);
+        greetingWaitingTimeoutRef.current = null;
+      }
+      pageTurnCallbackRef.current = null;
+    }
+  }, [phase]);
 
   // Initialize GSAP orchestration hook
   useDiaryAnimation({
@@ -69,18 +111,21 @@ export default function DiaryBook({
     isFlipping,
     setIsFlipping,
     flipDirection,
+    onPageTurnMidpoint: () => {
+      if (pageTurnCallbackRef.current) {
+        pageTurnCallbackRef.current();
+        pageTurnCallbackRef.current = null;
+      }
+    },
+    overlayRef,
   });
 
   // Handle page turns
   const triggerPageTurn = (direction: "forward" | "backward", nextAction: () => void) => {
+    pageTurnCallbackRef.current = nextAction;
     setFlipDirection(direction);
     setIsFlipping(true);
     transitionTo("page_turn");
-    
-    // Once flipping completes, the hook will resolve state to "answer" or "waiting"
-    setTimeout(() => {
-      nextAction();
-    }, 425); // Trigger mid-flip state change for seamless transition (halfway through 0.85s flip)
   };
 
   const handleSelectAnswer = (ans: any) => {
@@ -92,15 +137,19 @@ export default function DiaryBook({
     // Put into thinking state to disable interactions
     transitionTo("thinking");
 
-    const timer = setInterval(() => {
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+    typingIntervalRef.current = setInterval(() => {
       if (i < textToType.length) {
         currentText += textToType[i];
         setQuery(currentText);
         i++;
       } else {
-        clearInterval(timer);
+        if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = null;
         // Small pause after typing finishes, then turn page
-        setTimeout(() => {
+        if (typingDelayTimeoutRef.current) clearTimeout(typingDelayTimeoutRef.current);
+        typingDelayTimeoutRef.current = setTimeout(() => {
+          typingDelayTimeoutRef.current = null;
           triggerPageTurn("forward", () => {
             onSubmit(ans);
           });
@@ -139,14 +188,20 @@ export default function DiaryBook({
             text={diaryConfig.greeting}
             speed={60}
             delay={1500}
+            fontClass="diary-ink-text font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-normal"
+            center={true}
             onComplete={() => {
               // Wait 2.5s, then trigger fade out
-              setTimeout(() => {
+              if (greetingFadeTimeoutRef.current) clearTimeout(greetingFadeTimeoutRef.current);
+              greetingFadeTimeoutRef.current = setTimeout(() => {
+                greetingFadeTimeoutRef.current = null;
                 setGreetingFading(true);
               }, 2500);
 
               // Wait 3.5s total (1s after fade starts), then transition to waiting
-              setTimeout(() => {
+              if (greetingWaitingTimeoutRef.current) clearTimeout(greetingWaitingTimeoutRef.current);
+              greetingWaitingTimeoutRef.current = setTimeout(() => {
+                greetingWaitingTimeoutRef.current = null;
                 transitionTo("waiting");
                 setGreetingFading(false);
               }, 3500);
@@ -182,8 +237,11 @@ export default function DiaryBook({
         />
 
         {/* Quick results dropdown - floats elegantly above index */}
-        {phase === "waiting" && query.trim().length > 0 && (
-          <div className="absolute bottom-2 left-2 right-2 diary-quick-dropdown max-h-36 overflow-y-auto border border-dashed border-[rgba(118,83,46,0.2)] rounded p-1 bg-gold/5 space-y-1 z-20">
+        {phase === "waiting" && query.trim().length > 0 && filtered.length > 0 && (
+          <div 
+            className="absolute bottom-2 left-2 right-2 diary-quick-dropdown max-h-36 overflow-y-auto rounded p-1 space-y-1 z-20"
+            onWheel={(e) => e.stopPropagation()}
+          >
             {filtered.map((cmd, i) => (
               <button
                 key={cmd.id}

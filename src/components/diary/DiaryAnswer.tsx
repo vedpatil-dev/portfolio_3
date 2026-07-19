@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DiaryWriter from "./DiaryWriter";
 import projectsData from "@/src/data/content/projects.json";
 
@@ -25,6 +25,11 @@ interface DiaryAnswerProps {
 
 export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
   const [preambleDone, setPreambleDone] = useState(false);
+
+  // Reset preamble animation state whenever the active answer changes
+  useEffect(() => {
+    setPreambleDone(false);
+  }, [answer]);
 
   // Generate Riddle-style preambles
   const getPreamble = () => {

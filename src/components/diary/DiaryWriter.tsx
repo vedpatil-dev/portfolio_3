@@ -10,6 +10,7 @@ interface DiaryWriterProps {
   delay?: number; // ms delay before writing starts
   fontClass?: string;
   startWriting?: boolean;
+  center?: boolean;
 }
 
 export default function DiaryWriter({
@@ -19,6 +20,7 @@ export default function DiaryWriter({
   delay = 500,
   fontClass = "diary-ink-text",
   startWriting = true,
+  center = false,
 }: DiaryWriterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [displayedText, setDisplayedText] = useState("");
@@ -100,7 +102,7 @@ export default function DiaryWriter({
   return (
     <div ref={containerRef} className={fontClass}>
       {lines.map((line, lIdx) => (
-        <div key={lIdx} className="min-h-[1.5em] flex flex-wrap">
+        <div key={lIdx} className={`min-h-[1.5em] flex flex-wrap ${center ? "justify-center" : "justify-start"}`}>
           {line.split("").map((char, cIdx) => (
             <span
               key={cIdx}

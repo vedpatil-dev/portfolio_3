@@ -27,7 +27,7 @@ export const animateBookEntrance = (
     rotationY: -5,
     rotationZ: 0,
     opacity: 1,
-    duration: 1.1, // Snappy entry
+    duration: 0.75, // Snappy entry
     ease: "power3.out",
   });
 
@@ -51,7 +51,7 @@ export const animateBookOpening = (
   if (lock) {
     tl.to(lock, {
       rotateY: 90,
-      duration: 0.45,
+      duration: 0.25,
       ease: "power2.inOut",
     });
   }
@@ -61,7 +61,7 @@ export const animateBookOpening = (
     coverLeft,
     {
       rotateY: -10, // open on the left
-      duration: 1.45,
+      duration: 1.1,
       ease: "power3.out",
       onUpdate: function() {
         // At the midpoint of cover rotation (when cover passes 90deg, i.e., progress > 0.5)
@@ -86,7 +86,7 @@ export const animateBookOpening = (
       pages[0],
       {
         rotateY: -5,
-        duration: 1.45, // Match cover duration
+        duration: 1.1, // Match cover duration
         ease: "power3.out", // Match cover ease
         onUpdate: function() {
           const progress = this.progress();
@@ -106,7 +106,7 @@ export const animateBookOpening = (
         { rotateY: 0 },
         {
           rotateY: 5,
-          duration: 1.15,
+          duration: 0.95,
           ease: "power2.out",
         },
         "-=1.1"
@@ -120,6 +120,7 @@ export const animateBookOpening = (
 export const animatePageFlip = (
   pageSheet: HTMLElement,
   isForward: boolean,
+  onMidpoint?: () => void,
   onComplete?: () => void
 ) => {
   const tl = gsap.timeline({ onComplete });
@@ -141,6 +142,10 @@ export const animatePageFlip = (
     }
   });
 
+  if (onMidpoint) {
+    tl.call(onMidpoint, [], 0.425);
+  }
+
   return tl;
 };
 
@@ -149,6 +154,7 @@ export const animateBookClosing = (
   coverLeft: HTMLElement,
   lock: HTMLElement | null,
   pages: HTMLElement[],
+  overlay: HTMLElement | null,
   onComplete?: () => void
 ) => {
   const tl = gsap.timeline({ onComplete });
@@ -215,6 +221,14 @@ export const animateBookClosing = (
     duration: 0.9,
     ease: "power3.in",
   }, "-=0.2");
+
+  if (overlay) {
+    tl.to(overlay, {
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.out",
+    }, "-=0.6");
+  }
 
   return tl;
 };

@@ -33,7 +33,7 @@ export default function DiaryPages({
   };
 
   return (
-    <div className={`w-full h-full flex transform-style-preserve-3d ${getMobileClass()}`}>
+    <div className={`w-full h-full relative z-10 flex transform-style-preserve-3d ${getMobileClass()}`}>
       
       {/* ── LEFT PAGE SHEET ── */}
       <div
