@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { prepareWithSegments, layoutWithLines, PreparedTextWithSegments } from "@chenglou/pretext";
+import { prepareWithSegments, PreparedTextWithSegments } from "@chenglou/pretext";
 
 interface InteractiveParagraphProps {
   text: string;
   className?: string;  // Styling for the outer wrapper
   fontClass?: string;  // Styling for the text inside, e.g. "font-handwritten text-lg text-ink-faded"
   fontSpec?: string;   // Font spec for canvas measurement, e.g. "18px Caveat"
-  lineHeight?: number; // Line height in pixels, e.g. 24
 }
 
 interface WordInfo {
@@ -24,26 +23,13 @@ export default function InteractiveParagraph({
   className = "",
   fontClass = "font-handwritten text-lg text-ink-faded leading-relaxed",
   fontSpec = "18px Caveat, cursive",
-  lineHeight = 26,
 }: InteractiveParagraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState<number | null>(null);
+  const [layoutKey, setLayoutKey] = useState(0);
   const preparedRef = useRef<PreparedTextWithSegments | null>(null);
   const wordsInfoRef = useRef<WordInfo[]>([]);
 
-  // 1. Listen to container resize to recalculate line wrapping
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setWidth(entry.contentRect.width);
-      }
-    });
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  // 2. Prepare pretext text layout once
+  // 1. Prepare pretext text layout once
   if (!preparedRef.current && typeof window !== "undefined") {
     try {
       preparedRef.current = prepareWithSegments(text, fontSpec);
@@ -52,33 +38,63 @@ export default function InteractiveParagraph({
     }
   }
 
-  // 3. Perform pretext line breaking layout
-  const layoutResult = width && preparedRef.current
-    ? layoutWithLines(preparedRef.current, width, lineHeight)
-    : null;
-
-  // 4. Measure initial word positions once after layout changes
+  // 2. Trigger remeasurement on window resize
   useEffect(() => {
-    if (!layoutResult || !containerRef.current) return;
+    const handleResize = () => {
+      setLayoutKey((k) => k + 1);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-    const spans = containerRef.current.querySelectorAll(".interactive-word");
-    const info: WordInfo[] = [];
+  // 3. Measure word positions after font loading or layout changes
+  useEffect(() => {
+    let active = true;
 
-    spans.forEach((span) => {
-      const el = span as HTMLSpanElement;
-      info.push({
-        element: el,
-        initialX: el.offsetLeft,
-        initialY: el.offsetTop,
-        currentX: 0,
-        currentY: 0,
+    const measure = () => {
+      if (!containerRef.current || !active) return;
+
+      const spans = containerRef.current.querySelectorAll(".interactive-word");
+      const info: WordInfo[] = [];
+
+      spans.forEach((span) => {
+        const el = span as HTMLSpanElement;
+        // Reset styles first to get untransformed base layout offsets
+        el.style.transform = "";
+        el.style.color = "";
+
+        info.push({
+          element: el,
+          initialX: el.offsetLeft,
+          initialY: el.offsetTop,
+          currentX: 0,
+          currentY: 0,
+        });
       });
-    });
 
-    wordsInfoRef.current = info;
-  }, [layoutResult, width]);
+      wordsInfoRef.current = info;
+    };
 
-  // 5. Run requestAnimationFrame animation loop to handle serpent interaction
+    // Initial measurement
+    measure();
+
+    // Remeasure once fonts are loaded
+    if (typeof document !== "undefined" && (document as any).fonts) {
+      (document as any).fonts.ready.then(() => {
+        measure();
+      });
+    }
+
+    // Fallback remeasure after a small delay
+    const timer = setTimeout(measure, 400);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [layoutKey, text]);
+
+  // 4. Animation loop for serpent deflection
   useEffect(() => {
     let active = true;
 
@@ -105,7 +121,7 @@ export default function InteractiveParagraph({
             const dy = word.initialY - localSerpentY;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            // Tweakable repulsion variables
+            // Repulsion variables
             const radius = 80; // Interaction radius (px)
             const maxForce = 70; // Max displacement force (px)
 
@@ -130,7 +146,7 @@ export default function InteractiveParagraph({
               word.element.style.transform = `translate(${word.currentX.toFixed(
                 2
               )}px, ${word.currentY.toFixed(2)}px)`;
-              word.element.style.color = "var(--blood-ink)"; // Magical color reaction
+              word.element.style.color = "var(--blood-ink)";
             } else {
               word.element.style.transform = "";
               word.element.style.color = "";
@@ -164,43 +180,25 @@ export default function InteractiveParagraph({
     return () => {
       active = false;
     };
-  }, [layoutResult]);
+  }, [layoutKey]);
 
-  // SSR / Fallback layout if Pretext hasn't layout yet
-  if (!layoutResult) {
-    return (
-      <div ref={containerRef} className={`${className} ${fontClass}`}>
-        {text}
-      </div>
-    );
-  }
+  // Split text into words for natural inline-block layout flow
+  const words = text.split(" ");
 
   return (
     <div
       ref={containerRef}
-      className={`${className} ${fontClass} relative select-none`}
-      style={{ minHeight: layoutResult.height }}
+      className={`${className} ${fontClass} relative flex flex-wrap select-none`}
     >
-      {layoutResult.lines.map((line, lineIndex) => {
-        const words = line.text.split(" ");
-        return (
-          <div
-            key={lineIndex}
-            className="flex flex-wrap relative"
-            style={{ height: lineHeight }}
-          >
-            {words.map((word, wordIndex) => (
-              <span
-                key={wordIndex}
-                className="interactive-word inline-block mr-1.5 cursor-default select-text"
-                style={{ willChange: "transform, color" }}
-              >
-                {word}
-              </span>
-            ))}
-          </div>
-        );
-      })}
+      {words.map((word, wordIndex) => (
+        <span
+          key={wordIndex}
+          className="interactive-word inline-block mr-1.5 shrink-0 cursor-default select-text"
+          style={{ willChange: "transform, color" }}
+        >
+          {word}
+        </span>
+      ))}
     </div>
   );
 }
