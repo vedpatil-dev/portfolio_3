@@ -3,18 +3,35 @@
     {
       "id": "emgage",
       "company": "Emgage HRMS",
-      "role": "Full Stack Developer Intern",
-      "duration": "Sep 2025 - Present",
+      "role": "Full Stack Developer",
+      "duration": "Jul 2026 - Present",
       "summary": "Developing enterprise-grade HRMS modules using Spring Boot, React.js, and PostgreSQL.",
       "animation": "salute",
       "icon": "/emgage.png",
       "description": [
-        "Developed and maintained enterprise HRMS modules for client organizations",
+        "Developing and maintaining enterprise-grade HRMS modules as a full-time Full Stack Developer",
+        "Building dynamic, responsive frontends using React.js and Material UI (MUI) components",
+        "Developing robust backend web services and business logic utilizing Spring Boot framework",
+        "Designing and integrating secure REST APIs for seamless frontend-backend communication",
+        "Working extensively with PostgreSQL databases, designing schemas and optimizing SQL queries for performance",
+        "Maintaining codebase version control, performing testing, and resolving production bugs"
+      ],
+      "skills": ["Software Architecture", "AWS", "DevOps", "Docker"]
+    },
+    {
+      "id": "emgage-intern",
+      "company": "Emgage HRMS (Internship)",
+      "role": "Full Stack Developer Intern",
+      "duration": "Sep 2025 - Jun 2026",
+      "summary": "Developed enterprise-grade HRMS modules using Spring Boot, React.js, and PostgreSQL.",
+      "animation": "salute",
+      "icon": "/emgage.png",
+      "description": [
+        "Developed and maintained enterprise HRMS modules for client organizations as an intern",
         "Built dynamic, responsive frontends using React.js and Material UI (MUI) components",
         "Developed robust backend web services and business logic utilizing Spring Boot framework",
         "Designed and integrated secure REST APIs for seamless frontend-backend communication",
-        "Worked extensively with PostgreSQL databases, designing schemas and optimizing SQL queries for performance",
-        "Maintained codebase version control, performed testing, and resolved production bugs"
+        "Worked with PostgreSQL databases, designing schemas and optimizing SQL queries"
       ],
       "skills": ["Spring Boot", "React.js", "PostgreSQL", "REST APIs", "Material UI (MUI)", "Java"]
     },

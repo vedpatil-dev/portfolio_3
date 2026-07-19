@@ -1,0 +1,470 @@
+/* ── Riddle's Diary 3D and Magical Styles ── */
+
+:root {
+  --diary-shadow-color: rgba(16, 11, 8, 0.4);
+}
+
+/* Overlay Backdrop */
+.diary-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 5, 4, 0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.diary-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Perspective Wrapper */
+.diary-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 2000px;
+  transform-style: preserve-3d;
+  overflow: hidden;
+}
+
+/* 3D Book Frame */
+.diary-book-3d {
+  position: relative;
+  width: 100%;
+  max-width: 1080px;
+  height: 72vh;
+  min-height: 520px;
+  transform-style: preserve-3d;
+  transform: rotateX(15deg) rotateY(-5deg) translateZ(-200px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.5s ease-out;
+}
+
+/* Spine Crease / Binding hinges */
+.diary-spine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  transform: translateX(-50%) translateZ(1px);
+  background: linear-gradient(
+    90deg,
+    #18100b 0%,
+    #3c2214 30%,
+    #120c08 50%,
+    #3c2214 70%,
+    #18100b 100%
+  );
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    inset 1px 0 3px rgba(255,255,255,0.05),
+    inset -1px 0 3px rgba(255,255,255,0.05);
+  border-radius: 2px;
+  z-index: 100;
+}
+
+/* Leather Covers */
+.diary-cover-3d {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  background: var(--leather);
+  border: 4px solid var(--leather-light);
+  border-radius: 6px 0 0 6px;
+  box-shadow:
+    inset -10px 0 30px rgba(0, 0, 0, 0.7),
+    0 25px 55px rgba(0, 0, 0, 0.6);
+  transform-style: preserve-3d;
+  transform-origin: right center;
+  z-index: 5;
+}
+
+.diary-cover-3d.left {
+  left: 0;
+  border-radius: 6px 0 0 6px;
+  transform-origin: right center;
+  transform: perspective(2000px) rotateY(180deg); /* Closed cover by default */
+  z-index: 40; /* On top of left pages */
+}
+
+.diary-cover-3d.right {
+  right: 0;
+  border-radius: 0 6px 6px 0;
+  transform-origin: left center;
+  box-shadow:
+    inset 10px 0 30px rgba(0, 0, 0, 0.7),
+    0 25px 55px rgba(0, 0, 0, 0.6);
+}
+
+/* Golden Lock Clasp */
+.diary-lock-clasp {
+  position: absolute;
+  right: -2px;
+  top: 45%;
+  width: 32px;
+  height: 50px;
+  background: radial-gradient(circle at center, var(--gold) 30%, #5d461d 90%);
+  border: 2px solid #3c2d11;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  cursor: pointer;
+  z-index: 50;
+  transform-origin: left center;
+}
+
+/* Page Sheets Layout */
+.diary-page-sheet {
+  position: absolute;
+  width: calc(50% - 6px);
+  height: calc(100% - 20px);
+  top: 10px;
+  background-color: var(--parchment-light);
+  background-image: 
+    radial-gradient(circle at center, rgba(248, 230, 200, 0.15) 0%, transparent 80%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.46 0 0 0 0 0.33 0 0 0 0 0.18 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  transform-style: preserve-3d;
+  backface-visibility: visible; /* Base pages are visible from both sides to avoid pop-ins during opening */
+  transition: box-shadow 0.5s ease;
+}
+
+.diary-page-sheet.flipping-page {
+  backface-visibility: hidden; /* Only the transient flipping page hides backface during flips */
+}
+
+/* Ruled Parchment Lines */
+.diary-ruled-parchment {
+  position: absolute;
+  inset: 0;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Aged paper edges & stains */
+  box-shadow: inset 0 0 35px rgba(118, 83, 46, 0.18);
+  border: 1px solid rgba(118, 83, 46, 0.12);
+  scrollbar-width: none;
+}
+
+.diary-ruled-parchment::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ruled lines pattern */
+.diary-ruled-lines-bg {
+  position: absolute;
+  inset: 40px 32px;
+  background-image: linear-gradient(
+    rgba(118, 83, 46, 0.08) 1px,
+    transparent 1px
+  );
+  background-size: 100% 28px;
+  pointer-events: none;
+}
+
+.diary-page-sheet.left {
+  left: 6px;
+  border-radius: 4px 0 0 4px;
+  transform-origin: right center;
+  transform: perspective(2000px) rotateY(180deg); /* Closed left page by default */
+  z-index: 30; /* Middle of closed stack */
+  box-shadow:
+    inset -25px 0 35px rgba(0, 0, 0, 0.15),
+    inset 0 0 20px rgba(118, 83, 46, 0.1),
+    -5px 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.diary-page-sheet.right {
+  right: 6px;
+  border-radius: 0 4px 4px 0;
+  transform-origin: left center;
+  transform: perspective(2000px) rotateY(0deg); /* Flat right page */
+  z-index: 20; /* Bottom of closed stack */
+  box-shadow:
+    inset 25px 0 35px rgba(0, 0, 0, 0.15),
+    inset 0 0 20px rgba(118, 83, 46, 0.1),
+    5px 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Spine Shadow Overlay */
+.diary-spine-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.diary-page-sheet.left .diary-spine-shadow {
+  right: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.18) 70%, rgba(0,0,0,0.3) 100%);
+}
+
+.diary-page-sheet.right .diary-spine-shadow {
+  left: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0) 100%);
+}
+
+/* Page Curvature & Depth (tactile sheet stacks) */
+.diary-page-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border-bottom: 2px solid rgba(16,11,8,0.15);
+  pointer-events: none;
+}
+
+.diary-page-sheet.left::before {
+  border-left: 2px solid rgba(16,11,8,0.12);
+}
+
+.diary-page-sheet.right::before {
+  border-right: 2px solid rgba(16,11,8,0.12);
+}
+
+/* Breathing Animation (Tactile Page Movement) */
+@keyframes breathing-left {
+  0% { transform: perspective(2000px) rotateY(-5deg); }
+  50% { transform: perspective(2000px) rotateY(-6.5deg) skewY(-0.2deg); }
+  100% { transform: perspective(2000px) rotateY(-5deg); }
+}
+
+@keyframes breathing-right {
+  0% { transform: perspective(2000px) rotateY(5deg); }
+  50% { transform: perspective(2000px) rotateY(6.5deg) skewY(0.2deg); }
+  100% { transform: perspective(2000px) rotateY(5deg); }
+}
+
+.diary-book-3d.breathing .diary-page-sheet.left {
+  animation: breathing-left 9s ease-in-out infinite;
+}
+
+.diary-book-3d.breathing .diary-page-sheet.right {
+  animation: breathing-right 9.5s ease-in-out infinite;
+}
+
+/* Ink Typewriter & Blooms */
+.diary-ink-text {
+  font-family: var(--font-handwritten), 'Caveat', cursive;
+  color: var(--ink);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  position: relative;
+  display: inline;
+}
+
+/* Blinking Riddle Cursor */
+.diary-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 18px;
+  background-color: var(--blood-ink);
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: cursor-blink 1.2s infinite steps(2, start);
+  opacity: 0.8;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.8; }
+}
+
+/* Ink Bloom Effect for Input typing */
+.ink-bloom-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.92);
+  filter: blur(2px);
+  animation: ink-bloom-in 0.4s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+  will-change: opacity, transform, filter;
+}
+
+@keyframes ink-bloom-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+    filter: blur(4px) drop-shadow(0 0 3px var(--ink));
+    color: var(--blood-ink);
+  }
+  40% {
+    opacity: 0.8;
+    transform: scale(1.05);
+    filter: blur(1.5px);
+    color: var(--ink);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+    color: var(--ink);
+  }
+}
+
+/* Parchment Style Input */
+.diary-input-wrapper {
+  margin-top: 20px;
+  position: relative;
+  width: 100%;
+}
+
+.diary-input-field {
+  width: 100%;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid rgba(118, 83, 46, 0.25) !important;
+  outline: none !important;
+  padding: 10px 4px !important;
+  font-family: var(--font-handwritten), 'Caveat', cursive !important;
+  font-size: 1.45rem !important;
+  color: var(--ink) !important;
+  caret-color: var(--blood-ink) !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.diary-input-field::placeholder {
+  color: rgba(118, 83, 46, 0.4) !important;
+  font-style: italic !important;
+}
+
+.diary-input-line-highlight {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: var(--blood-ink);
+  transform: translateX(-50%);
+  transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.diary-input-field:focus + .diary-input-line-highlight {
+  width: 100%;
+}
+
+/* Dissolve into Ink Keyframes */
+.ink-dissolve {
+  animation: ink-dissolving 1s cubic-bezier(0.4, 0, 0.8, 0.4) forwards;
+  pointer-events: none;
+}
+
+@keyframes ink-dissolving {
+  0% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 0.5;
+    filter: blur(2px) url("#diary-ink-ripple");
+    transform: translateY(3px) scaleY(1.05);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(6px) url("#diary-ink-ripple");
+    transform: translateY(12px) scaleY(1.2);
+  }
+}
+
+/* Close Button */
+.diary-close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(118, 83, 46, 0.3);
+  background: rgba(214, 189, 137, 0.5);
+  color: var(--ink-faded);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 550;
+  transition: all 0.3s ease;
+}
+
+.diary-close-btn:hover {
+  background: rgba(104, 29, 24, 0.1);
+  border-color: var(--blood-ink);
+  color: var(--blood-ink);
+  transform: rotate(90deg);
+}
+
+/* Mobile Flattened Layout */
+@media (max-width: 820px) {
+  .diary-book-3d {
+    max-width: 100% !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    transform: none !important;
+    perspective: none !important;
+    transform-style: flat !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    display: block !important;
+    overflow-y: auto !important;
+  }
+
+  .diary-spine {
+    display: none !important;
+  }
+
+  .diary-cover-3d {
+    display: none !important;
+  }
+
+  .diary-page-sheet {
+    position: relative !important;
+    width: 100% !important;
+    height: 100vh !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    perspective: none !important;
+    backface-visibility: visible !important;
+  }
+
+  .diary-ruled-parchment {
+    padding: 70px 24px 40px 24px !important;
+    box-shadow: inset 0 0 20px rgba(118, 83, 46, 0.15) !important;
+  }
+
+  .diary-page-sheet.left .diary-spine-shadow,
+  .diary-page-sheet.right .diary-spine-shadow {
+    display: none !important;
+  }
+
+  /* Single page switching via visibility */
+  .mobile-show-left .diary-page-sheet.right {
+    display: none !important;
+  }
+
+  .mobile-show-right .diary-page-sheet.left {
+    display: none !important;
+  }
+}
