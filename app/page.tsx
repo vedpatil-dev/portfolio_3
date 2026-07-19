@@ -12,7 +12,7 @@ export default function Home() {
       {/* ── HERO SECTION ─────────────────────────────────────────────── */}
       <section
         className="map-section relative flex flex-col items-center justify-center text-center overflow-hidden"
-        style={{ minHeight: "calc(100vh - 120px)", justifyContent: "center" }}
+        style={{ minHeight: "calc(100vh - 150px)", justifyContent: "center" }}
         aria-labelledby="hero-title"
       >
         {/* Map coordinate label top-left */}

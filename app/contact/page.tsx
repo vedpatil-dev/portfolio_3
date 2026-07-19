@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <MapShell>
-      <section className="map-section px-4 py-12 md:py-16" aria-labelledby="contact-title">
+      <section className="map-section px-4 animate-map-fade-in" aria-labelledby="contact-title">
         <div className="max-w-2xl w-full mx-auto space-y-10">
 
           {/* Chapter header */}

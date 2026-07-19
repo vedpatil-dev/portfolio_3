@@ -23,7 +23,7 @@ export default function Preloader() {
       if (msgIndex < messages.length) {
         setMessage(messages[msgIndex]);
       }
-    }, 700);
+    }, 300);
 
     // Minimum preloader time of 3.8 seconds for cinematic feel
     const timer = setTimeout(() => {
@@ -32,7 +32,7 @@ export default function Preloader() {
         setLoading(false);
       }, 700); // matches fade-out transition duration
       return () => clearTimeout(exitTimer);
-    }, 3800);
+    }, 2000);
 
     return () => {
       clearInterval(interval);

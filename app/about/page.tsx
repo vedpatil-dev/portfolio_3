@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <MapShell>
-      <section className="map-section px-4 py-12 md:py-16" aria-labelledby="about-title">
-        <div className="max-w-5xl w-full mx-auto space-y-10">
+      <section className="map-section px-4 py-4" aria-labelledby="about-title">
+        <div className="max-w-5xl w-full mx-auto space-y-10 mb-24">
 
           {/* Chapter header */}
           <div className="text-center">

@@ -17,7 +17,7 @@ export default function ProjectsPage() {
 
   return (
     <MapShell>
-      <section className="map-section px-4 py-12 md:py-16" aria-labelledby="projects-title">
+      <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="projects-title">
         <div className="max-w-5xl w-full mx-auto space-y-10">
 
           {/* Chapter header */}

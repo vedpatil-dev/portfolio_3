@@ -36,7 +36,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <MapShell>
-      <section className="map-section px-4 py-12 md:py-16" aria-labelledby="project-detail-title">
+      <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="project-detail-title">
         <div className="max-w-3xl w-full mx-auto space-y-8">
 
           {/* Back link */}

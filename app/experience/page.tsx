@@ -31,7 +31,7 @@ export default function ExperiencePage() {
         </defs>
       </svg>
 
-      <section className="map-section px-4 py-12 md:py-16" aria-labelledby="exp-title">
+      <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="exp-title">
         <div className="max-w-5xl w-full mx-auto space-y-12">
 
           {/* Chapter header */}
