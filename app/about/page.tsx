@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <MapShell>
-      <section className="map-section px-4 py-4" aria-labelledby="about-title">
+      <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="about-title">
         <div className="max-w-5xl w-full mx-auto space-y-10 mb-24">
 
           {/* Chapter header */}
@@ -93,8 +93,8 @@ export default function AboutPage() {
             </h2>
             <div className="flex flex-wrap gap-2 md:gap-3 justify-center py-4">
               {skillsData.categories.flatMap((cat) => cat.skills).map((skill, index) => (
-                <span 
-                  key={index} 
+                <span
+                  key={index}
                   className="skill-tag px-3.5 py-2 font-serif text-sm border border-parchment-dark/30 bg-parchment-light/35 text-leather rounded-sm transition-all duration-200 hover:scale-105 hover:bg-parchment-light/60 cursor-default"
                 >
                   {skill.name}
@@ -145,8 +145,8 @@ export default function AboutPage() {
                   <span>Download Resume</span>
                 </a>
               </div>
-              </div>
             </div>
+          </div>
 
           {/* Contact / Social links */}
           <div className="map-content-card p-6">

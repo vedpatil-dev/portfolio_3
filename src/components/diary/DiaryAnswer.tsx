@@ -1,19 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import DiaryWriter from "./DiaryWriter";
 import projectsData from "@/src/data/content/projects.json";
+import experienceData from "@/src/data/content/experience.json";
+import { ProjectEntry, ExperienceEntry } from "@/src/types/portfolio";
 
 interface AnswerData {
   title: string;
   subtitle?: string;
   type: "project" | "projects" | "experience" | "about" | "skills" | "contact" | "search_results" | "custom_text";
   content?: string | string[];
-  project?: any;
-  experience?: any;
+  project?: ProjectEntry;
+  experience?: ExperienceEntry;
   results?: {
-    projects: any[];
-    experiences: any[];
+    projects: ProjectEntry[];
+    experiences: ExperienceEntry[];
     skills: string[];
   };
 }
@@ -24,18 +27,21 @@ interface DiaryAnswerProps {
 }
 
 export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
+  // Use state with the answer object itself as the key/tracker
+  const [prevAnswer, setPrevAnswer] = useState<AnswerData | null>(null);
   const [preambleDone, setPreambleDone] = useState(false);
 
-  // Reset preamble animation state whenever the active answer changes
-  useEffect(() => {
+  // If the answer changed, reset preambleDone in render
+  if (answer !== prevAnswer) {
+    setPrevAnswer(answer);
     setPreambleDone(false);
-  }, [answer]);
+  }
 
   // Generate Riddle-style preambles
   const getPreamble = () => {
     switch (answer.type) {
       case "project":
-        return `I remember crafting this artifact... ${answer.project.name || "It"} was a creation born of intent. Let me share its records.`;
+        return `I remember crafting this artifact... ${answer.project?.name || "It"} was a creation born of intent. Let me share its records.`;
       case "projects":
         return "I have documented my creations on these pages. Examine these artifacts of code...";
       case "experience":
@@ -85,11 +91,12 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
           {answer.type === "project" && answer.project && (
             <div className="diary-project-details font-handwritten text-ink-faded space-y-4">
               {answer.project.image && (
-                <div className="w-full h-40 overflow-hidden rounded border border-[rgba(118,83,46,0.2)] shadow-inner">
-                  <img 
+                <div className="w-full h-40 overflow-hidden rounded border border-[rgba(118,83,46,0.2)] shadow-inner relative">
+                  <Image 
                     src={answer.project.image} 
                     alt={answer.project.name} 
-                    className="w-full h-full object-cover grayscale opacity-90 hover:grayscale-0 transition-all duration-300"
+                    fill
+                    className="object-cover grayscale opacity-90 hover:grayscale-0 transition-all duration-300"
                   />
                 </div>
               )}
@@ -147,7 +154,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
           {answer.type === "projects" && (
             <div className="space-y-4 font-handwritten">
               <div className="divide-y divide-dashed divide-[rgba(118,83,46,0.18)]">
-                {(answer.results?.projects || projectsData.projects).map((proj: any) => (
+                {(answer.results?.projects || projectsData.projects).map((proj: ProjectEntry) => (
                   <div key={proj.id} className="py-3 first:pt-0">
                     <h4 className="font-display text-blood-ink text-lg">{proj.name}</h4>
                     <p className="text-sm text-ink-faded mb-1">{proj.summary}</p>
@@ -160,7 +167,38 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
             </div>
           )}
 
-          {/* EXPERIENCE DETAIL */}
+          {/* EXPERIENCE LIST — shown when no single experience is selected */}
+          {answer.type === "experience" && !answer.experience && (
+            <div className="space-y-4 font-handwritten">
+              <div className="divide-y divide-dashed divide-[rgba(118,83,46,0.18)]">
+                {(answer.results?.experiences || (experienceData.entries as ExperienceEntry[])).map((exp: ExperienceEntry) => (
+                  <div key={exp.id} className="py-3 first:pt-0">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-display text-blood-ink text-lg">{exp.company}</h4>
+                        <span className="text-sm italic text-ink">{exp.role}</span>
+                      </div>
+                      <span className="text-xs opacity-60 text-right">{exp.duration}</span>
+                    </div>
+                    {exp.summary && (
+                      <p className="text-sm text-ink-faded mt-1">{exp.summary}</p>
+                    )}
+                    {exp.skills && exp.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {exp.skills.map((skill: string) => (
+                          <span key={skill} className="px-1.5 py-0.5 border border-[rgba(118,83,46,0.25)] rounded text-xs bg-gold/5">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* EXPERIENCE DETAIL — shown for a single experience entry */}
           {answer.type === "experience" && answer.experience && (
             <div className="font-handwritten text-ink-faded space-y-3">
               <div className="flex justify-between items-start">
@@ -287,7 +325,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
                 <div className="border-t border-dashed border-[rgba(118,83,46,0.18)] pt-2">
                   <strong className="text-blood-ink">Matching Artifacts (Projects):</strong>
                   <div className="divide-y divide-[rgba(118,83,46,0.1)]">
-                    {answer.results.projects.map((p) => (
+                    {answer.results.projects.map((p: ProjectEntry) => (
                       <div key={p.id} className="py-2">
                         <span className="font-bold text-ink">{p.name}</span> — <span className="text-sm">{p.summary}</span>
                         <div className="mt-1">
@@ -305,7 +343,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
                 <div className="border-t border-dashed border-[rgba(118,83,46,0.18)] pt-2">
                   <strong className="text-blood-ink">Matching Chronicles (Experience):</strong>
                   <div className="divide-y divide-[rgba(118,83,46,0.1)]">
-                    {answer.results.experiences.map((e) => (
+                    {answer.results.experiences.map((e: ExperienceEntry) => (
                       <div key={e.id} className="py-2">
                         <span className="font-bold text-ink">{e.company}</span> — <span className="text-sm italic">{e.role} ({e.duration})</span>
                         <p className="text-sm opacity-80 mt-0.5">{e.summary}</p>
