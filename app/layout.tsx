@@ -4,6 +4,7 @@ import "./globals.css";
 import CursorSerpent from "@/src/components/effects/CursorSerpent";
 import Preloader from "@/src/components/layout/Preloader";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 // ── Pirate map font — headings, chapter titles, nav labels ──
@@ -71,6 +72,7 @@ export default function RootLayout({
         <Preloader />
         {children}
         <Analytics />
+        <SpeedInsights />
         <CursorSerpent />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
