@@ -11,7 +11,7 @@
         "Secure role-based user authentication and access controls",
         "Responsive, utility-first UI for cross-device pipeline monitoring"
       ],
-      "image": "/projects/Conduit.png",
+      "image": "/projects/conduit.png",
       "gitLink": "https://github.com/vedpatil-dev/Conduit",
       "demoLink": "",
       "techStack": ["Spring Boot", "Next.js", "TypeScript", "Docker", "Tailwind CSS", "Java"]

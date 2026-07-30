@@ -8,15 +8,19 @@ import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact | Ved Patil",
-  description: "Send an owl or reach out directly to Ved Patil for full stack engineering collaborations, projects, or inquiries.",
+  title: "Contact Ved Patil | Full Stack Developer",
+  description:
+    "Get in touch with Ved Patil for full-stack software development collaborations, engineering opportunities, or inquiries.",
+  alternates: {
+    canonical: "https://vedpatil.in/contact",
+  },
 };
 
 export default function ContactPage() {
   return (
     <MapShell>
       <section className="map-section px-4 animate-map-fade-in" aria-labelledby="contact-title">
-        <div className="max-w-2xl w-full mx-auto space-y-10">
+        <div className="max-w-7xl w-full mx-auto space-y-10">
 
           {/* Chapter header */}
           <div className="text-center">

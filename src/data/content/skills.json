@@ -15,6 +15,7 @@
       "skills": [
         { "name": "React.js", "icon": "/assets/react.svg" },
         { "name": "Next.js", "icon": "/assets/nextjs.svg" },
+        { "name": "Redux Toolkit", "icon": "/assets/redux.svg" },
         { "name": "Material UI (MUI)", "icon": "/assets/mui.svg" },
         { "name": "Tailwind CSS", "icon": "/assets/tailwind.svg" },
         { "name": "TanStack", "icon": "/assets/tanstack.svg" },
@@ -42,6 +43,7 @@
     {
       "name": "DevOps & Tools",
       "skills": [
+        { "name": "AWS", "icon": "/assets/aws.svg" },
         { "name": "Git & GitHub", "icon": "/assets/git.svg" },
         { "name": "Docker", "icon": "/assets/docker.svg" },
         { "name": "Jenkins", "icon": "/assets/jenkins.svg" },

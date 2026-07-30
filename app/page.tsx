@@ -2,18 +2,33 @@ import Link from "next/link";
 import MapShell from "@/src/components/layout/MapShell";
 import profileData from "@/src/data/content/profile.json";
 import socialData from "@/src/data/content/social.json";
-import { Mail } from "lucide-react";
+import aboutData from "@/src/data/content/about.json";
+import projectsData from "@/src/data/content/projects.json";
+import experienceData from "@/src/data/content/experience.json";
+import { Mail, ArrowRight, Briefcase, Trophy, User } from "lucide-react";
 import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
 import ThemeLogo from "@/src/components/layout/ThemeLogo";
 import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Ved Patil | Full Stack Developer",
+  description:
+    "Ved Patil is a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL. Explore his projects, experience, and software development work.",
+  alternates: {
+    canonical: "https://vedpatil.in",
+  },
+};
 
 export default function Home() {
+  const featuredProjects = projectsData.projects.slice(0, 3);
+  const recentExperience = experienceData.entries.slice(0, 3);
+
   return (
     <MapShell>
       {/* ── HERO SECTION ─────────────────────────────────────────────── */}
       <section
-        className="map-section relative flex flex-col items-center justify-center text-center overflow-hidden"
-        style={{ minHeight: "calc(100vh - 150px)", justifyContent: "center" }}
+        className="map-section relative flex flex-col items-center justify-center text-center overflow-hidden min-h-[calc(100vh-120px)] py-12"
         aria-labelledby="hero-title"
       >
         {/* Map coordinate label top-left */}
@@ -45,17 +60,17 @@ export default function Home() {
 
         {/* ── MAIN HERO CONTENT ── */}
         <div className="relative z-10 max-w-2xl mx-auto px-6 opacity-0 translate-y-4 animate-map-fade-in">
-          {/* Themed Magic Logo - responsive scale (larger on mobile) */}
+          {/* Themed Magic Logo - responsive scale */}
           <div className="flex justify-center mb-4">
             <ThemeLogo className="w-28 h-28 sm:w-24 sm:h-24 md:w-20 md:h-20" />
           </div>
 
-          {/* Small eyebrow label */}
+          {/* Eyebrow label */}
           <p className="font-handwritten text-sm text-leather font-semibold tracking-widest mb-3 opacity-90">
             ✦ Full Stack Developer ✦
           </p>
 
-          {/* Main name */}
+          {/* Primary H1 Heading */}
           <h1
             id="hero-title"
             className="font-display text-5xl sm:text-6xl md:text-7xl text-leather leading-tight mb-2"
@@ -93,7 +108,7 @@ export default function Home() {
               className="px-6 py-3 font-display text-sm tracking-wider text-leather border-2 border-parchment-dark/70 hover:border-gold rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
               style={{ background: "rgba(150, 115, 49, 0.35)" }}
             >
-              View My Work →
+              About Ved Patil →
             </Link>
             <Link
               href="/projects"
@@ -139,6 +154,104 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── SEMANTIC CONTENT SECTIONS FOR CRAWLABILITY ───────────────────── */}
+      <div className="max-w-7xl mx-auto px-4 pb-16 space-y-12">
+        {/* ABOUT SECTION */}
+        <section aria-labelledby="about-heading" className="map-content-card p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-4 border-b border-parchment-dark/25 pb-3">
+            <User className="w-5 h-5 text-blood-ink shrink-0" />
+            <h2 id="about-heading" className="font-display text-2xl md:text-3xl text-leather">
+              About Ved Patil
+            </h2>
+          </div>
+          <div className="font-handwritten text-base md:text-lg text-ink-faded space-y-3 leading-relaxed">
+            {aboutData.bio.map((paragraph, idx) => (
+              <p key={idx}>{paragraph}</p>
+            ))}
+          </div>
+          <div className="mt-5 pt-3 border-t border-dashed border-parchment-dark/25">
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-1.5 font-display text-xs tracking-wider text-blood-ink hover:text-leather font-bold transition-colors"
+            >
+              <span>Learn more about Ved Patil&apos;s background & education</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </section>
+
+        {/* FEATURED PROJECTS SECTION */}
+        <section aria-labelledby="projects-heading" className="map-content-card p-6 md:p-8">
+          <div className="flex items-center justify-between mb-4 border-b border-parchment-dark/25 pb-3">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-blood-ink shrink-0" />
+              <h2 id="projects-heading" className="font-display text-2xl md:text-3xl text-leather">
+                Featured Projects by Ved Patil
+              </h2>
+            </div>
+            <Link
+              href="/projects"
+              className="font-handwritten text-sm text-blood-ink hover:underline hidden sm:block"
+            >
+              View all projects →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 font-handwritten">
+            {featuredProjects.map((project) => (
+              <div
+                key={project.id}
+                className="p-4 rounded border border-parchment-dark/30 bg-parchment-light/40 flex flex-col justify-between"
+              >
+                <div>
+                  <h3 className="font-display text-lg text-blood-ink mb-1">{project.name}</h3>
+                  <p className="text-xs text-ink-faded leading-relaxed mb-3">{project.summary}</p>
+                </div>
+                <Link
+                  href={`/projects/${project.slug}`}
+                  className="text-xs text-blood-ink font-bold hover:underline flex items-center gap-1"
+                >
+                  <span>Examine Project</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* EXPERIENCE SECTION */}
+        <section aria-labelledby="experience-heading" className="map-content-card p-6 md:p-8">
+          <div className="flex items-center justify-between mb-4 border-b border-parchment-dark/25 pb-3">
+            <div className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-blood-ink shrink-0" />
+              <h2 id="experience-heading" className="font-display text-2xl md:text-3xl text-leather">
+                Professional Experience
+              </h2>
+            </div>
+            <Link
+              href="/experience"
+              className="font-handwritten text-sm text-blood-ink hover:underline hidden sm:block"
+            >
+              Full history →
+            </Link>
+          </div>
+          <div className="space-y-4 font-handwritten">
+            {recentExperience.map((exp) => (
+              <div key={exp.id} className="border-b border-dashed border-parchment-dark/20 pb-3 last:border-0 last:pb-0">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-display text-lg text-blood-ink inline">{exp.company}</h3>
+                    <span className="text-xs text-ink opacity-80 italic ml-2">— {exp.role}</span>
+                  </div>
+                  <span className="text-xs text-ink-faded opacity-70">{exp.duration}</span>
+                </div>
+                <p className="text-xs text-ink-faded mt-1">{exp.summary}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </MapShell>
   );
 }
+

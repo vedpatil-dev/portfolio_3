@@ -10,8 +10,12 @@ type Project = typeof projectsData.projects[0];
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Projects | Ved Patil",
-  description: "Explore the software engineering projects, web applications, and tools built by Ved Patil.",
+  title: "Projects | Ved Patil — Software Portfolio",
+  description:
+    "Explore the software engineering projects, web applications, full-stack solutions, and open-source software built by Ved Patil.",
+  alternates: {
+    canonical: "https://vedpatil.in/projects",
+  },
 };
 
 export default function ProjectsPage() {
@@ -19,7 +23,7 @@ export default function ProjectsPage() {
   return (
     <MapShell>
       <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="projects-title">
-        <div className="max-w-5xl w-full mx-auto space-y-10">
+        <div className="max-w-7xl w-full mx-auto space-y-10">
 
           {/* Chapter header */}
           <div className="text-center">

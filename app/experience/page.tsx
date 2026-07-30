@@ -6,8 +6,12 @@ import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Experience | Ved Patil",
-  description: "Browse the professional roles, internships, and MERN/Full Stack Developer history of Ved Patil.",
+  title: "Experience | Ved Patil — Full Stack Developer",
+  description:
+    "Explore the professional experience, software development roles, and full stack engineering history of Ved Patil at Emgage HRMS, Tech Elecon, 1M1B Foundation, and AICTE + EY.",
+  alternates: {
+    canonical: "https://vedpatil.in/experience",
+  },
 };
 
 export default function ExperiencePage() {
@@ -34,7 +38,7 @@ export default function ExperiencePage() {
       </svg>
 
       <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="exp-title">
-        <div className="max-w-5xl w-full mx-auto space-y-12">
+        <div className="max-w-7xl w-full mx-auto space-y-12">
 
           {/* Chapter header */}
           <div className="text-center">

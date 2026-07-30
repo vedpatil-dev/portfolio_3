@@ -24,8 +24,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
   return {
-    title: `${project.name} | Projects | Ved Patil`,
-    description: project.summary,
+    title: `${project.name} — Project by Ved Patil`,
+    description: `${project.name}: ${project.summary}. Built by Full Stack Developer Ved Patil using ${project.techStack.join(", ")}.`,
+    alternates: {
+      canonical: `https://vedpatil.in/projects/${slug}`,
+    },
+    openGraph: {
+      title: `${project.name} | Ved Patil Software Portfolio`,
+      description: project.summary,
+      url: `https://vedpatil.in/projects/${slug}`,
+    },
   };
 }
 
@@ -37,8 +45,27 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <MapShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": project.name,
+            "description": project.summary,
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "All",
+            "author": {
+              "@type": "Person",
+              "@id": "https://vedpatil.in/#person",
+              "name": "Ved Patil"
+            },
+            "url": `https://vedpatil.in/projects/${slug}`
+          }),
+        }}
+      />
       <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="project-detail-title">
-        <div className="max-w-3xl w-full mx-auto space-y-8">
+        <div className="max-w-7xl w-full mx-auto space-y-8">
 
           {/* Back link */}
           <Link

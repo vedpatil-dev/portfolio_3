@@ -24,16 +24,63 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: "Ved Patil | Developer Portfolio",
-  description: `I'm Ved Patil, a Full Stack Developer who enjoys building software and continuously learning how great products are designed and engineered.
-
-My journey into software development started with a curiosity about how applications work behind the scenes. Over time, that curiosity evolved into a passion for creating reliable, scalable, and user-focused solutions.
-
-Throughout my experience, I have worked across the frontend, backend, databases, deployment, and development workflows. More importantly, I have learned that software engineering is not just about writing code—it's about solving problems, collaborating with people, understanding requirements, and continuously improving through feedback and experience.
-
-I enjoy exploring new technologies, optimizing existing solutions, and taking on challenges that push me to grow as a developer. Whether it's building features, debugging complex issues, improving performance, or learning a new concept, I see every project as an opportunity to become a better engineer.
-
-Currently, I am focused on strengthening my expertise in full-stack development, software architecture, and building applications that create meaningful value for users.`,
+  metadataBase: new URL("https://vedpatil.in"),
+  title: {
+    default: "Ved Patil | Full Stack Developer",
+    template: "%s | Ved Patil",
+  },
+  description:
+    "Ved Patil is a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL. Explore his projects, experience, and software development work.",
+  keywords: [
+    "Ved Patil",
+    "Ved Patil developer",
+    "Ved Patil full stack developer",
+    "Ved Patil software developer",
+    "Ved Patil portfolio",
+    "Ved Patil React developer",
+    "Ved Patil Java developer",
+    "Ved Patil Spring Boot developer",
+    "Ved Patil GitHub",
+    "Ved Patil Emgage",
+    "Full Stack Developer",
+    "React",
+    "Next.js",
+    "Spring Boot",
+    "Java",
+    "PostgreSQL",
+  ],
+  authors: [{ name: "Ved Patil", url: "https://vedpatil.in" }],
+  creator: "Ved Patil",
+  publisher: "Ved Patil",
+  alternates: {
+    canonical: "https://vedpatil.in",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://vedpatil.in",
+    title: "Ved Patil | Full Stack Developer",
+    description:
+      "Ved Patil is a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL. Explore his projects, experience, and software development work.",
+    siteName: "Ved Patil Portfolio",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ved Patil | Full Stack Developer",
+    description:
+      "Ved Patil is a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -52,19 +99,48 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Person",
-              "name": "Ved Patil",
-              "jobTitle": "Full Stack Developer",
-              "url": "https://vedpatil.in",
-              "sameAs": [
-                "https://github.com/vedpatil-dev",
-                "https://linkedin.com/in/vedpatil-dev"
-              ],
-              "alumniOf": {
-                "@type": "EducationalOrganization",
-                "name": "Madhuben And Bhanubhai Patel Institute of Technology"
-              }
-            })
+              "@graph": [
+                {
+                  "@type": "Person",
+                  "@id": "https://vedpatil.in/#person",
+                  "name": "Ved Patil",
+                  "url": "https://vedpatil.in/",
+                  "jobTitle": "Full Stack Developer",
+                  "description":
+                    "Ved Patil is a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL.",
+                  "sameAs": [
+                    "https://github.com/vedpatil-dev",
+                    "https://linkedin.com/in/vedpatil-dev"
+                  ],
+                  "knowsAbout": [
+                    "Full Stack Development",
+                    "React",
+                    "Next.js",
+                    "Java",
+                    "Spring Boot",
+                    "PostgreSQL",
+                    "TypeScript",
+                    "JavaScript",
+                    "Docker",
+                    "REST APIs"
+                  ],
+                  "alumniOf": {
+                    "@type": "EducationalOrganization",
+                    "name": "Madhuben And Bhanubhai Patel Institute of Technology"
+                  }
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://vedpatil.in/#website",
+                  "url": "https://vedpatil.in/",
+                  "name": "Ved Patil",
+                  "alternateName": "Ved Patil Portfolio",
+                  "publisher": {
+                    "@id": "https://vedpatil.in/#person"
+                  }
+                }
+              ]
+            }),
           }}
         />
       </head>

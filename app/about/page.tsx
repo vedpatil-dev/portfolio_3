@@ -3,23 +3,36 @@ import profileData from "@/src/data/content/profile.json";
 import aboutData from "@/src/data/content/about.json";
 import skillsData from "@/src/data/content/skills.json";
 import socialData from "@/src/data/content/social.json";
-import { Mail, FileText } from "lucide-react";
-import { FaGithub as Github, FaLinkedin as Linkedin } from 'react-icons/fa'
+import { Mail, FileText, Code2, Layout, Server, Database, Wrench, Sparkles } from "lucide-react";
+import { FaGithub as Github, FaLinkedin as Linkedin } from 'react-icons/fa';
 import ThemeLogo from "@/src/components/layout/ThemeLogo";
 import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
+import TechIcon from "@/src/components/skills/TechIcon";
 
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About | Ved Patil",
-  description: "Learn more about Ved Patil's background, education, skills, and full stack development journey.",
+  title: "About Ved Patil | Full Stack Developer",
+  description:
+    "Learn about Ved Patil, a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL. Explore his background, education, and development journey.",
+  alternates: {
+    canonical: "https://vedpatil.in/about",
+  },
+};
+
+const getCategoryIcon = (categoryName: string) => {
+  if (categoryName.includes("Language")) return Code2;
+  if (categoryName.includes("Frontend")) return Layout;
+  if (categoryName.includes("Backend")) return Server;
+  if (categoryName.includes("Database")) return Database;
+  return Wrench;
 };
 
 export default function AboutPage() {
   return (
     <MapShell>
       <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="about-title">
-        <div className="max-w-5xl w-full mx-auto space-y-10 mb-24">
+        <div className="max-w-7xl w-full mx-auto space-y-10 mb-24">
 
           {/* Chapter header */}
           <div className="text-center">
@@ -88,18 +101,50 @@ export default function AboutPage() {
 
           {/* Unified Skills Section */}
           <div id="skills" className="map-content-card p-6 md:p-8 scroll-mt-24">
-            <h2 className="font-display text-2xl text-leather mb-4 border-b border-parchment-dark/25 pb-2">
-              Skills & Technology
-            </h2>
-            <div className="flex flex-wrap gap-2 md:gap-3 justify-center py-4">
-              {skillsData.categories.flatMap((cat) => cat.skills).map((skill, index) => (
-                <span
-                  key={index}
-                  className="skill-tag px-3.5 py-2 font-serif text-sm border border-parchment-dark/30 bg-parchment-light/35 text-leather rounded-sm transition-all duration-200 hover:scale-105 hover:bg-parchment-light/60 cursor-default"
-                >
-                  {skill.name}
-                </span>
-              ))}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-parchment-dark/25 pb-3 mb-6">
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="w-6 h-6 text-blood-ink shrink-0" />
+                <h2 className="font-display text-2xl md:text-3xl text-leather">
+                  Skills & Technology
+                </h2>
+              </div>
+              <span className="font-handwritten text-sm text-gold/90 italic">
+                ✦ Languages, Frameworks & Developer Tooling ✦
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {skillsData.categories.map((category) => {
+                const CategoryIcon = getCategoryIcon(category.name);
+                return (
+                  <div
+                    key={category.name}
+                    className="p-5 rounded border border-parchment-dark/30 bg-parchment-light/40 transition-all duration-300 hover:border-gold/60 hover:bg-parchment-light/60 hover:shadow-md flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2.5 mb-3 border-b border-dashed border-parchment-dark/30 pb-2">
+                        <div className="p-1.5 rounded bg-parchment-dark/10 text-blood-ink">
+                          <CategoryIcon className="w-4 h-4 shrink-0" />
+                        </div>
+                        <h3 className="font-display text-lg text-blood-ink font-semibold">
+                          {category.name}
+                        </h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {category.skills.map((skill) => (
+                          <span
+                            key={skill.name}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 font-handwritten text-sm font-semibold text-leather border border-parchment-dark/30 bg-parchment-light/80 rounded-sm shadow-sm transition-all duration-200 hover:scale-105 hover:border-gold hover:text-blood-ink hover:bg-parchment-light cursor-default"
+                          >
+                            <TechIcon name={skill.name} />
+                            <span>{skill.name}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
