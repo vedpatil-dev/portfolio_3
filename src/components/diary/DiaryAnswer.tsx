@@ -5,6 +5,9 @@ import Image from "next/image";
 import DiaryWriter from "./DiaryWriter";
 import projectsData from "@/src/data/content/projects.json";
 import experienceData from "@/src/data/content/experience.json";
+import aboutData from "@/src/data/content/about.json";
+import skillsData from "@/src/data/content/skills.json";
+import socialData from "@/src/data/content/social.json";
 import { ProjectEntry, ExperienceEntry } from "@/src/types/portfolio";
 
 interface AnswerData {
@@ -236,44 +239,38 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
           {/* ABOUT ME DETAIL */}
           {answer.type === "about" && (
             <div className="font-handwritten text-ink-faded space-y-4">
-              <p className="text-lg leading-relaxed">
-                I am Ved Patil, a Full Stack Developer who enjoys building software and continuously learning how great products are designed and engineered.
-              </p>
-              <p className="text-base leading-relaxed">
-                My journey into software development started with a curiosity about how applications work behind the scenes. Over time, that curiosity evolved into a passion for creating reliable, scalable, and user-focused solutions.
-              </p>
-              <div className="border-t border-dashed border-[rgba(118,83,46,0.18)] pt-3">
-                <h4 className="font-display text-blood-ink text-lg mb-2">Schooling & Academics</h4>
-                <div className="space-y-2">
-                  <div>
-                    <h5 className="font-bold text-ink">B.Tech in Computer Engineering</h5>
-                    <p className="text-sm opacity-80">Madhuben & Bhanubhai Patel Institute of Technology | 2021 - 2025</p>
+              {aboutData.bio.map((paragraph: string, idx: number) => (
+                <p key={idx} className="text-lg leading-relaxed">{paragraph}</p>
+              ))}
+              {aboutData.education && aboutData.education.length > 0 && (
+                <div className="border-t border-dashed border-[rgba(118,83,46,0.18)] pt-3">
+                  <h4 className="font-display text-blood-ink text-lg mb-2">Schooling & Academics</h4>
+                  <div className="space-y-3">
+                    {aboutData.education.map((edu, idx) => (
+                      <div key={idx}>
+                        <h5 className="font-bold text-ink">{edu.degree}</h5>
+                        <p className="text-sm opacity-80">{edu.institution} | {edu.duration}</p>
+                        {edu.details && <p className="text-sm text-ink-faded mt-0.5">{edu.details}</p>}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
           {/* SKILLS DETAIL */}
           {answer.type === "skills" && (
             <div className="font-handwritten text-ink-faded space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-display text-blood-ink text-lg border-b border-dashed border-[rgba(118,83,46,0.2)] pb-1 mb-2">Frontend Runes</h4>
-                  <p className="text-base leading-relaxed">React, Next.js, HTML5, CSS3, TailwindCSS, JavaScript, TypeScript, GSAP, Framer Motion.</p>
-                </div>
-                <div>
-                  <h4 className="font-display text-blood-ink text-lg border-b border-dashed border-[rgba(118,83,46,0.2)] pb-1 mb-2">Backend & Sorcery</h4>
-                  <p className="text-base leading-relaxed">Node.js, Express, Java, Spring Boot, REST APIs, GraphQL, Microservices.</p>
-                </div>
-                <div>
-                  <h4 className="font-display text-blood-ink text-lg border-b border-dashed border-[rgba(118,83,46,0.2)] pb-1 mb-2">Vaults (Databases)</h4>
-                  <p className="text-base leading-relaxed">MongoDB, MySQL, PostgreSQL, Redis.</p>
-                </div>
-                <div>
-                  <h4 className="font-display text-blood-ink text-lg border-b border-dashed border-[rgba(118,83,46,0.2)] pb-1 mb-2">Tools & Portals</h4>
-                  <p className="text-base leading-relaxed">Git, GitHub, Docker, AWS, Vercel, Netlify, Linux, Postman.</p>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {skillsData.categories.map((cat) => (
+                  <div key={cat.name}>
+                    <h4 className="font-display text-blood-ink text-lg border-b border-dashed border-[rgba(118,83,46,0.2)] pb-1 mb-2">{cat.name}</h4>
+                    <p className="text-base leading-relaxed">
+                      {cat.skills.map((s) => s.name).join(", ")}.
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -283,24 +280,30 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
             <div className="font-handwritten text-ink-faded space-y-4 text-lg">
               <p>You may send owls or direct transmissions to these coordinates:</p>
               <ul className="space-y-3 pl-2">
-                <li>
-                  <strong className="text-blood-ink">Owl (Email):</strong>{" "}
-                  <a href="mailto:vedpatil.dev@gmail.com" className="underline hover:text-blood-ink">
-                    vedpatil.dev@gmail.com
-                  </a>
-                </li>
-                <li>
-                  <strong className="text-blood-ink">LinkedIn Seal:</strong>{" "}
-                  <a href="https://linkedin.com/in/vedpatil-dev" target="_blank" rel="noopener noreferrer" className="underline hover:text-blood-ink">
-                    linkedin.com/in/vedpatil-dev
-                  </a>
-                </li>
-                <li>
-                  <strong className="text-blood-ink">GitHub Repository:</strong>{" "}
-                  <a href="https://github.com/vedpatil-dev" target="_blank" rel="noopener noreferrer" className="underline hover:text-blood-ink">
-                    github.com/vedpatil-dev
-                  </a>
-                </li>
+                {socialData.email && (
+                  <li>
+                    <strong className="text-blood-ink">Owl (Email):</strong>{" "}
+                    <a href={`mailto:${socialData.email}`} className="underline hover:text-blood-ink">
+                      {socialData.email}
+                    </a>
+                  </li>
+                )}
+                {socialData.linkedin && (
+                  <li>
+                    <strong className="text-blood-ink">LinkedIn Seal:</strong>{" "}
+                    <a href={socialData.linkedin} target="_blank" rel="noopener noreferrer" className="underline hover:text-blood-ink">
+                      {socialData.linkedin.replace("https://", "")}
+                    </a>
+                  </li>
+                )}
+                {socialData.github && (
+                  <li>
+                    <strong className="text-blood-ink">GitHub Repository:</strong>{" "}
+                    <a href={socialData.github} target="_blank" rel="noopener noreferrer" className="underline hover:text-blood-ink">
+                      {socialData.github.replace("https://", "")}
+                    </a>
+                  </li>
+                )}
               </ul>
             </div>
           )}

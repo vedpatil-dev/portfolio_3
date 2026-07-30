@@ -1,4 +1,5 @@
 import MapShell from "@/src/components/layout/MapShell";
+import Image from "next/image";
 import experienceData from "@/src/data/content/experience.json";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
@@ -128,9 +129,11 @@ export default function ExperiencePage() {
                           boxShadow: "0 2px 8px rgba(16,11,8,0.15), inset 0 1px 4px rgba(255,255,255,0.2)",
                         }}
                       >
-                        <img
+                        <Image
                           src={entry.icon}
                           alt={`${entry.company} logo`}
+                          width={48}
+                          height={48}
                           className="object-contain justify-center aspect-square mx-auto"
                         />
                       </div>

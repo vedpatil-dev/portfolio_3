@@ -80,8 +80,33 @@ type SegmentPosition = {
   angle: number;
 };
 
+interface CustomWindow extends Window {
+  __serpentPositions?: SegmentPosition[];
+  __serpentOpacity?: number;
+}
+
 export default function CursorSerpent() {
+  const [enabled, setEnabled] = React.useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("serpent_enabled") !== "false";
+  });
   const containerRef = useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleToggle = (e: Event) => {
+      const customEvent = e as CustomEvent<{ enabled?: boolean }>;
+      if (typeof customEvent.detail?.enabled === "boolean") {
+        setEnabled(customEvent.detail.enabled);
+      } else if (typeof window !== "undefined") {
+        setEnabled(localStorage.getItem("serpent_enabled") !== "false");
+      }
+    };
+
+    window.addEventListener("toggle-serpent", handleToggle);
+    return () => {
+      window.removeEventListener("toggle-serpent", handleToggle);
+    };
+  }, []);
 
   /**
    * Direct references to individual SVG segment groups.
@@ -161,7 +186,11 @@ export default function CursorSerpent() {
      * - touch-only devices
      * - users requesting reduced motion
      */
-    if (!finePointerQuery.matches || reducedMotionQuery.matches) {
+    if (!enabled || !finePointerQuery.matches || reducedMotionQuery.matches) {
+      if (typeof window !== "undefined") {
+        (window as unknown as CustomWindow).__serpentOpacity = 0;
+        (window as unknown as CustomWindow).__serpentPositions = [];
+      }
       return;
     }
 
@@ -544,9 +573,6 @@ export default function CursorSerpent() {
         requestAnimationFrame(animate);
     };
 
-    /**
-     * Start animation only if not already running.
-     */
     const startAnimation = () => {
       if (isAnimatingRef.current) return;
 
@@ -584,11 +610,6 @@ export default function CursorSerpent() {
 
         return;
       }
-
-      /**
-       * Do not automatically restart.
-       * Wait until the user actually moves the pointer.
-       */
     };
 
     window.addEventListener(
@@ -624,7 +645,9 @@ export default function CursorSerpent() {
         (window as any).__serpentOpacity = 0;
       }
     };
-  }, []);
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <div

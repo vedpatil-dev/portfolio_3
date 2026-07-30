@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import nodemailer from "nodemailer";
+import socialData from "@/src/data/content/social.json";
 
 // In-memory rate limiting configuration
 interface RateLimitRecord {
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
 
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
-    const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || "hello.vedpatil.in";
+    const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || socialData.email;
 
     if (!smtpUser || !smtpPass) {
       console.error("Error: SMTP_USER and SMTP_PASS environment variables are not configured.");
@@ -123,7 +124,7 @@ export async function POST(request: Request) {
     await transporter.sendMail(mailOptions);
 
     return NextResponse.json({ success: true, message: "Owl dispatched successfully!" });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error sending email via Nodemailer:", error);
     return NextResponse.json(
       { error: "Failed to dispatch owl. Please try again later." },

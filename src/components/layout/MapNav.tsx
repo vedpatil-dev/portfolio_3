@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Compass, Scroll, Swords, Trophy, Feather } from "lucide-react";
+import { Compass, Scroll, Swords, Trophy, Feather, Eye, EyeOff } from "lucide-react";
 
 const NAV_LOCATIONS = [
   { id: "home", label: "Home", icon: <Compass className="w-5 h-5 text-ink-faded" />, route: "/" },
@@ -17,6 +17,7 @@ export default function MapNav() {
   const containerRef = useRef<HTMLDivElement>(null);
   const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [paths, setPaths] = useState<string[]>([]);
+  const [dots, setDots] = useState<{ x: number; y: number }[]>([]);
   const [svgSize, setSvgSize] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
@@ -33,6 +34,9 @@ export default function MapNav() {
           y: r.top + r.height / 2 - rect.top,
         };
       });
+
+      const validDots = centers.filter((c): c is { x: number; y: number } => c !== null);
+      setDots(validDots);
 
       const newPaths: string[] = [];
       for (let i = 0; i < centers.length - 1; i++) {
@@ -51,6 +55,18 @@ export default function MapNav() {
     return () => window.removeEventListener("resize", compute);
   }, []);
 
+  const [serpentEnabled, setSerpentEnabled] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("serpent_enabled") !== "false";
+  });
+
+  const toggleSerpent = () => {
+    const next = !serpentEnabled;
+    setSerpentEnabled(next);
+    localStorage.setItem("serpent_enabled", String(next));
+    window.dispatchEvent(new CustomEvent("toggle-serpent", { detail: { enabled: next } }));
+  };
+
   const getActiveId = () => {
     if (pathname === "/") return "home";
     const match = NAV_LOCATIONS.find(
@@ -63,11 +79,28 @@ export default function MapNav() {
   return (
     <nav className="map-nav" aria-label="Main navigation">
       {/* Coordinate decorations — map flavour only */}
-      <div className="absolute top-1 left-3 map-coord-mark hidden md:block">
+      <div className="absolute top-2 left-3 map-coord-mark hidden md:block">
         19°04′N · 72°51′E
       </div>
-      <div className="absolute top-1 right-3 map-coord-mark hidden md:block">
-        Ved Patil
+      
+      {/* Top right header: Ved Patil + Serpent toggle button */}
+      <div className="absolute top-1.5 right-3 flex items-center gap-3 z-20">
+        <span className="map-coord-mark hidden md:inline">Ved Patil</span>
+        <button
+          onClick={toggleSerpent}
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-parchment-dark/40 hover:border-gold text-xs font-handwritten text-ink-faded hover:text-blood-ink transition-all cursor-pointer bg-parchment-light/70 shadow-xs"
+          title={serpentEnabled ? "Turn off Cursor Serpent" : "Turn on Cursor Serpent"}
+          aria-label={serpentEnabled ? "Turn off Cursor Serpent" : "Turn on Cursor Serpent"}
+        >
+          {serpentEnabled ? (
+            <Eye className="w-3.5 h-3.5 shrink-0 text-blood-ink" />
+          ) : (
+            <EyeOff className="w-3.5 h-3.5 shrink-0 text-ink-faded opacity-60" />
+          )}
+          <span className="font-bold text-[11px] uppercase tracking-wider">
+            {serpentEnabled ? "Serpent: ON" : "Serpent: OFF"}
+          </span>
+        </button>
       </div>
 
       <div
@@ -87,20 +120,15 @@ export default function MapNav() {
             {paths.map((d, i) => (
               <path key={i} d={d} className="nav-path-line" strokeLinecap="round" />
             ))}
-            {iconRefs.current.map((el, i) => {
-              if (!el || !containerRef.current) return null;
-              const rect = containerRef.current.getBoundingClientRect();
-              const r = el.getBoundingClientRect();
-              return (
-                <circle
-                  key={`dot-${i}`}
-                  cx={r.left + r.width / 2 - rect.left}
-                  cy={r.top + r.height / 2 - rect.top}
-                  r={3}
-                  fill="rgba(89, 64, 43, 0.4)"
-                />
-              );
-            })}
+            {dots.map((pt, i) => (
+              <circle
+                key={`dot-${i}`}
+                cx={pt.x}
+                cy={pt.y}
+                r={3}
+                fill="rgba(89, 64, 43, 0.4)"
+              />
+            ))}
           </svg>
         )}
 

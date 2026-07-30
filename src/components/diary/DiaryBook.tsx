@@ -237,7 +237,7 @@ export default function DiaryBook({
         />
 
         {/* Quick results dropdown - floats elegantly above index */}
-        {phase === "waiting" && query.trim().length > 0 && filtered.length > 0 && (
+        {(phase === "waiting" || phase === "answer") && query.trim().length > 0 && filtered.length > 0 && (
           <div 
             className="absolute bottom-2 left-2 right-2 diary-quick-dropdown max-h-36 overflow-y-auto rounded p-1 space-y-1 z-20"
             onWheel={(e) => e.stopPropagation()}

@@ -23,7 +23,7 @@ const VALID_TRANSITIONS: Record<DiaryPhase, DiaryPhase[]> = {
   waiting: ["thinking", "closing", "closed"],
   thinking: ["page_turn", "waiting", "closing", "closed"],
   page_turn: ["answer", "waiting", "closing", "closed"],
-  answer: ["page_turn", "waiting", "closing", "closed"],
+  answer: ["thinking", "page_turn", "waiting", "closing", "closed"],
   closing: ["closed"],
 };
 
