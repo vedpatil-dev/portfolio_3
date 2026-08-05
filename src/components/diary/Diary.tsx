@@ -6,65 +6,9 @@ import DiaryBook from "./DiaryBook";
 import projectsData from "@/src/data/content/projects.json";
 import experienceData from "@/src/data/content/experience.json";
 import skillsData from "@/src/data/content/skills.json";
-import {
-  Home as HomeIcon,
-  User as UserIcon,
-  BookOpen,
-  Briefcase,
-  FolderGit2,
-  Mail,
-  Folder,
-  Book,
-  X,
-} from "lucide-react";
+import { X } from "lucide-react";
 import "./diary.css";
-
-/* ── Command options ── */
-const COMMANDS = [
-  { id: "home", label: "Home", icon: <HomeIcon className="w-4 h-4" />, route: "/" },
-  { id: "about", label: "About", icon: <UserIcon className="w-4 h-4" />, route: "/about" },
-  { id: "skills", label: "Skills", icon: <BookOpen className="w-4 h-4" />, route: "/about#skills" },
-  { id: "experience", label: "Experience", icon: <Briefcase className="w-4 h-4" />, route: "/experience" },
-  { id: "projects", label: "Projects", icon: <FolderGit2 className="w-4 h-4" />, route: "/projects" },
-  { id: "contact", label: "Contact", icon: <Mail className="w-4 h-4" />, route: "/contact" },
-  ...projectsData.projects.map((p) => ({
-    id: p.slug,
-    label: `Project: ${p.name}`,
-    icon: <Folder className="w-4 h-4" />,
-    route: `/projects/${p.slug}`,
-    tags: p.techStack,
-  })),
-  ...experienceData.entries.map((e) => ({
-    id: e.id,
-    label: `Experience: ${e.company}`,
-    icon: <Book className="w-4 h-4" />,
-    route: `/experience#${e.id}`,
-    tags: e.skills,
-  })),
-];
-
-// Precomputed normalized search index for faster query filtering
-const SEARCH_INDEX = {
-  projects: projectsData.projects.map((p) => ({
-    ...p,
-    normalizedName: p.name.toLowerCase(),
-    normalizedSummary: p.summary.toLowerCase(),
-    normalizedTechStack: p.techStack.map((t) => t.toLowerCase()),
-  })),
-  experiences: experienceData.entries.map((e) => ({
-    ...e,
-    normalizedCompany: e.company.toLowerCase(),
-    normalizedRole: e.role.toLowerCase(),
-    normalizedSummary: e.summary.toLowerCase(),
-    normalizedDescription: e.description.map((d) => d.toLowerCase()),
-  })),
-  skills: skillsData.categories.flatMap((cat) =>
-    cat.skills.map((s) => ({
-      name: s.name,
-      normalizedName: s.name.toLowerCase(),
-    }))
-  ),
-};
+import { COMMANDS } from "@/src/lib/navigationCommands";
 
 interface DiaryProps {
   open: boolean;
@@ -77,6 +21,7 @@ export default function Diary({ open, onClose }: DiaryProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [answer, setAnswer] = useState<any | null>(null);
   const [highlighted, setHighlighted] = useState(0);
+  // Stays mounted permanently to preload textures and prevent white flash on open.
 
   // Sync state machine with parent open state
   useEffect(() => {
@@ -162,23 +107,24 @@ export default function Diary({ open, onClose }: DiaryProps) {
         } else if (["contact", "owl", "email", "reach"].includes(q)) {
           setAnswer({ title: "Send an Owl", type: "contact" });
         } else {
-          const matchedProjects = SEARCH_INDEX.projects.filter(
+          const matchedProjects = projectsData.projects.filter(
             (p) =>
-              p.normalizedName.includes(q) ||
-              p.normalizedSummary.includes(q) ||
-              p.normalizedTechStack.some((t) => t.includes(q))
+              p.name.toLowerCase().includes(q) ||
+              p.summary.toLowerCase().includes(q) ||
+              p.techStack.some((t) => t.toLowerCase().includes(q))
           );
 
-          const matchedExperiences = SEARCH_INDEX.experiences.filter(
+          const matchedExperiences = experienceData.entries.filter(
             (e) =>
-              e.normalizedCompany.includes(q) ||
-              e.normalizedRole.includes(q) ||
-              e.normalizedSummary.includes(q) ||
-              e.normalizedDescription.some((d) => d.includes(q))
+              e.company.toLowerCase().includes(q) ||
+              e.role.toLowerCase().includes(q) ||
+              e.summary.toLowerCase().includes(q) ||
+              e.description.some((d) => d.toLowerCase().includes(q))
           );
 
-          const matchedSkills = SEARCH_INDEX.skills
-            .filter((s) => s.normalizedName.includes(q))
+          const matchedSkills = skillsData.categories
+            .flatMap((cat) => cat.skills)
+            .filter((s) => s.name.toLowerCase().includes(q))
             .map((s) => s.name);
 
           if (matchedProjects.length > 0 || matchedExperiences.length > 0 || matchedSkills.length > 0) {
@@ -186,8 +132,8 @@ export default function Diary({ open, onClose }: DiaryProps) {
               title: `Search matches for "${query}"`,
               type: "search_results",
               results: {
-                projects: matchedProjects.map(({ normalizedName, normalizedSummary, normalizedTechStack, ...p }) => p),
-                experiences: matchedExperiences.map(({ normalizedCompany, normalizedRole, normalizedSummary, normalizedDescription, ...e }) => e),
+                projects: matchedProjects,
+                experiences: matchedExperiences,
                 skills: matchedSkills,
               },
             });
@@ -202,7 +148,6 @@ export default function Diary({ open, onClose }: DiaryProps) {
       }
 
       setQuery("");
-      transitionTo("page_turn");
     },
     [query, filtered, highlighted, transitionTo]
   );
@@ -238,20 +183,16 @@ export default function Diary({ open, onClose }: DiaryProps) {
     return () => window.removeEventListener("keydown", globalEsc);
   }, [phase, handleCloseTrigger]);
 
-  if (phase === "closed") return null;
-
   return (
     <div
       ref={overlayRef}
-      className="diary-overlay active"
+      className={`diary-overlay${phase !== "closed" ? " active" : ""}`}
       role="dialog"
       aria-modal="true"
+      aria-hidden={phase === "closed"}
+      inert={phase === "closed"}
       onClick={(e) => {
         if (e.target === e.currentTarget) handleCloseTrigger();
-      }}
-      style={{
-        transition: phase === "closing" ? "none" : "opacity 0.5s ease-in-out",
-        opacity: phase === "closing" ? undefined : 1,
       }}
     >
       {/* ── Overlay Close Button ── */}

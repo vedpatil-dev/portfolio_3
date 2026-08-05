@@ -55,10 +55,11 @@ export default function MapNav() {
     return () => window.removeEventListener("resize", compute);
   }, []);
 
-  const [serpentEnabled, setSerpentEnabled] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("serpent_enabled") !== "false";
-  });
+  const [serpentEnabled, setSerpentEnabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    setSerpentEnabled(localStorage.getItem("serpent_enabled") !== "false");
+  }, []);
 
   const toggleSerpent = () => {
     const next = !serpentEnabled;

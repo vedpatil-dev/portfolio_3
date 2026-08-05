@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import DiaryWriter from "./DiaryWriter";
 import projectsData from "@/src/data/content/projects.json";
@@ -9,6 +9,7 @@ import aboutData from "@/src/data/content/about.json";
 import skillsData from "@/src/data/content/skills.json";
 import socialData from "@/src/data/content/social.json";
 import { ProjectEntry, ExperienceEntry } from "@/src/types/portfolio";
+import ContactForm from "../contact/ContactForm";
 
 interface AnswerData {
   title: string;
@@ -34,11 +35,13 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
   const [prevAnswer, setPrevAnswer] = useState<AnswerData | null>(null);
   const [preambleDone, setPreambleDone] = useState(false);
 
-  // If the answer changed, reset preambleDone in render
-  if (answer !== prevAnswer) {
-    setPrevAnswer(answer);
-    setPreambleDone(false);
-  }
+  // If the answer changed, reset preambleDone when it mounts/updates
+  useEffect(() => {
+    if (answer !== prevAnswer) {
+      setPrevAnswer(answer);
+      setPreambleDone(false);
+    }
+  }, [answer, prevAnswer]);
 
   // Generate Riddle-style preambles
   const getPreamble = () => {
@@ -78,7 +81,10 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
 
       {/* Answer content revealed after Riddle finished writing the preamble */}
       {preambleDone && (
-        <div className="diary-details-area flex-1 overflow-y-auto pr-1 animate-[ink-bloom-in_0.6s_ease_forwards] border-t border-dashed border-[rgba(118,83,46,0.18)] pt-4 mt-2">
+        <div
+          className="diary-details-area flex-1 overflow-y-auto pr-4 border-t border-dashed border-[rgba(118,83,46,0.18)] pt-4 mt-2"
+          style={{ animation: "ink-bloom-in 0.6s ease forwards" }}
+        >
           {/* Title */}
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-display text-blood-ink text-xl tracking-wide">{answer.title}</h3>
@@ -279,7 +285,12 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
           {answer.type === "contact" && (
             <div className="font-handwritten text-ink-faded space-y-4 text-lg">
               <p>You may send owls or direct transmissions to these coordinates:</p>
-              <ul className="space-y-3 pl-2">
+              
+              <div className="mt-2 mb-4 p-3 rounded border border-dashed border-[rgba(118,83,46,0.25)] bg-gold/5">
+                <ContactForm />
+              </div>
+
+              <ul className="space-y-3 pl-2 border-t border-dashed border-[rgba(118,83,46,0.18)] pt-4">
                 {socialData.email && (
                   <li>
                     <strong className="text-blood-ink">Owl (Email):</strong>{" "}

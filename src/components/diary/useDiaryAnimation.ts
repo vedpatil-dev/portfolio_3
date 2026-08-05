@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import {
   animateBookEntrance,
@@ -45,7 +45,8 @@ export function useDiaryAnimation({
 }: UseDiaryAnimationProps) {
   const currentTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
-  useEffect(() => {
+  // Prime the restored layers before the browser paints a new opening phase.
+  useLayoutEffect(() => {
     // Kill any active timeline to avoid overlaps
     if (currentTimelineRef.current) {
       currentTimelineRef.current.kill();
@@ -62,20 +63,26 @@ export function useDiaryAnimation({
 
     switch (phase) {
       case "appearing": {
+        // Closing uses autoAlpha. Restore visibility before the entrance tween
+        // so the already-mounted parchment sheets can be composited first.
+        // Clear the close tween's inline autoAlpha so the active CSS state is
+        // the single source of truth for the overlay on every reopen.
+        gsap.set(overlayRef.current, { clearProps: "opacity,visibility" });
+        gsap.set(book, { autoAlpha: 1, force3D: true });
+
         // Set closed states on covers and pages so it flies in closed!
         if (coverLeft) {
           gsap.set(coverLeft, { rotateY: 180 });
         }
         if (leftPage) {
-          gsap.set(leftPage, { rotateY: 180 });
+          gsap.set(leftPage, { rotateY: 180, autoAlpha: 1, force3D: true });
         }
         if (rightPage) {
-          gsap.set(rightPage, { rotateY: 0 });
+          gsap.set(rightPage, { rotateY: 0, autoAlpha: 1, force3D: true });
         }
         if (lock) {
           gsap.set(lock, { rotateY: 0 });
         }
-
         // Play book flight in
         currentTimelineRef.current = animateBookEntrance(book, () => {
           transitionTo("landing");
@@ -166,7 +173,7 @@ export function useDiaryAnimation({
       default:
         break;
     }
-  }, [phase, transitionTo, bookRef, coverLeftRef, lockRef, leftPageRef, rightPageRef, flippingPageRef, isFlipping, flipDirection, setIsFlipping, onCloseComplete, onPageTurnMidpoint]);
+  }, [phase, transitionTo, bookRef, coverLeftRef, lockRef, leftPageRef, rightPageRef, flippingPageRef, isFlipping, flipDirection, setIsFlipping, onCloseComplete, onPageTurnMidpoint, overlayRef]);
 
   // Idle page movement / breathing effect when waiting
   useEffect(() => {

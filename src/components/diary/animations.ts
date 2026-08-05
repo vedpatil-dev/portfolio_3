@@ -17,7 +17,11 @@ export const animateBookEntrance = (
     rotationX: 45,
     rotationY: -15,
     rotationZ: -8,
-    opacity: 0,
+    // Keep the element technically paintable while it is off-screen. A fully
+    // hidden layer can cause browser engines to defer rasterizing its CSS
+    // background until the cover is already rotating.
+    opacity: 0.001,
+    force3D: true,
   });
 
   tl.to(book, {
@@ -64,10 +68,9 @@ export const animateBookOpening = (
       duration: 1.1,
       ease: "power3.out",
       onUpdate: function() {
-        // At the midpoint of cover rotation (when cover passes 90deg, i.e., progress > 0.5)
-        // change zIndex so the left page sheet is rendered above the left cover!
-        const progress = this.progress();
-        if (progress > 0.5) {
+        // Swap z-index exactly when crossing 90 degrees (mid-flip)
+        const currentRot = gsap.getProperty(coverLeft, "rotateY") as number;
+        if (currentRot < 90) {
           coverLeft.style.zIndex = "5"; // Move cover behind pages on the left
           if (pages[0]) pages[0].style.zIndex = "15";
         } else {
@@ -89,8 +92,8 @@ export const animateBookOpening = (
         duration: 1.1, // Match cover duration
         ease: "power3.out", // Match cover ease
         onUpdate: function() {
-          const progress = this.progress();
-          if (progress > 0.5) {
+          const currentRot = gsap.getProperty(pages[0], "rotateY") as number;
+          if (currentRot < 90) {
             pages[0].style.zIndex = "15"; // Lies on the left
           } else {
             pages[0].style.zIndex = "30"; // Still on the right, above right page
@@ -166,8 +169,8 @@ export const animateBookClosing = (
       duration: 0.65,
       ease: "power2.in",
       onUpdate: function() {
-        const progress = this.progress();
-        if (progress > 0.5) {
+        const currentRot = gsap.getProperty(pages[0], "rotateY") as number;
+        if (currentRot > 90) {
           pages[0].style.zIndex = "30"; // moves back to top on the right
         } else {
           pages[0].style.zIndex = "15"; // stays on the left
@@ -191,8 +194,8 @@ export const animateBookClosing = (
       duration: 0.75,
       ease: "power3.inOut",
       onUpdate: function() {
-        const progress = this.progress();
-        if (progress > 0.5) {
+        const currentRot = gsap.getProperty(coverLeft, "rotateY") as number;
+        if (currentRot > 90) {
           coverLeft.style.zIndex = "40"; // stays on top on the right
         } else {
           coverLeft.style.zIndex = "5"; // stays on the left
@@ -217,14 +220,14 @@ export const animateBookClosing = (
     z: -500,
     rotationX: 35,
     rotationY: 10,
-    opacity: 0,
+    autoAlpha: 0,
     duration: 0.9,
     ease: "power3.in",
   }, "-=0.2");
 
   if (overlay) {
     tl.to(overlay, {
-      opacity: 0,
+      autoAlpha: 0,
       duration: 0.6,
       ease: "power2.out",
     }, "-=0.6");

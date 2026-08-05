@@ -33,7 +33,9 @@ export default function DiaryPages({
   };
 
   return (
-    <div className={`w-full h-full relative z-10 flex transform-style-preserve-3d ${getMobileClass()}`}>
+    <div
+      className={`w-full h-full relative z-10 flex ${getMobileClass()}`}
+    >
       
       {/* ── LEFT PAGE SHEET ── */}
       <div
@@ -65,9 +67,9 @@ export default function DiaryPages({
         className="diary-page-sheet flipping-page z-30"
         style={{
           display: isFlipping ? "block" : "none",
-          left: flipDirection === "forward" ? "auto" : "6px",
-          right: flipDirection === "forward" ? "6px" : "auto",
-          transformOrigin: flipDirection === "forward" ? "left center" : "right center",
+          left: "auto",
+          right: "6px",
+          transformOrigin: "left center",
           transform: flipDirection === "forward" ? "perspective(2000px) rotateY(0deg)" : "perspective(2000px) rotateY(-180deg)",
           backgroundColor: "var(--parchment-light)",
           boxShadow: "0 15px 35px rgba(0,0,0,0.3)",

@@ -32,13 +32,15 @@ export default function InteractiveParagraph({
   const wordsInfoRef = useRef<WordInfo[]>([]);
 
   // 1. Prepare pretext text layout once
-  if (!preparedRef.current && typeof window !== "undefined") {
-    try {
-      preparedRef.current = prepareWithSegments(text, fontSpec);
-    } catch (e) {
-      console.warn("Failed to prepare pretext text layout:", e);
+  useEffect(() => {
+    if (!preparedRef.current && typeof window !== "undefined") {
+      try {
+        preparedRef.current = prepareWithSegments(text, fontSpec);
+      } catch (e) {
+        console.warn("Failed to prepare pretext text layout:", e);
+      }
     }
-  }
+  }, [text, fontSpec]);
 
   // 2. Trigger remeasurement on window resize
   useEffect(() => {

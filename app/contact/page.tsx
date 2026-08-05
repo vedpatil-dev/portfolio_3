@@ -25,7 +25,7 @@ export default function ContactPage() {
           {/* Chapter header */}
           <div className="text-center">
             <p className="chapter-number">
-              Chapter VI
+              Chapter V
             </p>
             <h1 id="contact-title" className="chapter-header text-3xl md:text-4xl">
               Contact
