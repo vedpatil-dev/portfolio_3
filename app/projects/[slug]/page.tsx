@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import MapShell from "@/src/components/layout/MapShell";
 import projectsData from "@/src/data/content/projects.json";
@@ -94,10 +95,15 @@ export default async function ProjectDetailPage({ params }: Props) {
               className="relative overflow-hidden"
               style={{ background: "rgba(155,118,65,0.3)" }}
             >
-              <img
+              {/* Why: next/image resizes/compresses the large PNG and reserves space (LCP/CLS). */}
+              <Image
                 src={project.image}
                 alt={`${project.name} screenshot`}
-                className="w-full object-cover opacity-70 hover:opacity-100 transition-opacity duration-500"
+                width={1920}
+                height={890}
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="w-full h-auto object-cover opacity-70 hover:opacity-100 transition-opacity duration-500"
               />
             </div>
 

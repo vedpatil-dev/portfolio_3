@@ -20,14 +20,15 @@ export const COMMANDS = [
   { id: "projects", label: "Projects", icon: <FolderGit2 className="w-4 h-4" />, route: "/projects" },
   { id: "contact", label: "Contact", icon: <Mail className="w-4 h-4" />, route: "/contact" },
   ...projectsData.projects.map((p) => ({
-    id: p.slug,
+    // Why: namespace ids so a slug/experience id can never collide with a static command or each other (React keys).
+    id: `project:${p.slug}`,
     label: `Project: ${p.name}`,
     icon: <Folder className="w-4 h-4" />,
     route: `/projects/${p.slug}`,
     tags: p.techStack,
   })),
   ...experienceData.entries.map((e) => ({
-    id: e.id,
+    id: `experience:${e.id}`,
     label: `Experience: ${e.company}`,
     icon: <Book className="w-4 h-4" />,
     route: `/experience#${e.id}`,

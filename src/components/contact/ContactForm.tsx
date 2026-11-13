@@ -11,12 +11,18 @@ export default function ContactForm() {
   });
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Why: error styling must not depend on message wording ("Failed" substring).
+  const [isError, setIsError] = useState(false);
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
   // Load remaining cooldown on mount
   useEffect(() => {
-    const expiryStr = localStorage.getItem("owl_cooldown_expiry");
+    // Why: localStorage can throw (private mode / blocked storage); the form must still render.
+    let expiryStr: string | null = null;
+    try {
+      expiryStr = localStorage.getItem("owl_cooldown_expiry");
+    } catch {}
     if (expiryStr) {
       const expiry = parseInt(expiryStr, 10);
       const remaining = Math.ceil((expiry - Date.now()) / 1000);
@@ -35,6 +41,14 @@ export default function ContactForm() {
     return () => clearTimeout(timer);
   }, [cooldown]);
 
+  // Why: storage failures must not turn a delivered message into a "Failed" error.
+  const saveCooldown = (seconds: number) => {
+    try {
+      localStorage.setItem("owl_cooldown_expiry", (Date.now() + seconds * 1000).toString());
+    } catch {}
+    setCooldown(seconds);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -43,6 +57,7 @@ export default function ContactForm() {
     e.preventDefault();
     if (isSubmitting || cooldown > 0) return;
 
+    setIsError(false);
     setStatus("Sending...");
     setIsSubmitting(true);
 
@@ -55,30 +70,24 @@ export default function ContactForm() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      // Why: error bodies may be non-JSON (e.g. proxy 502 HTML); don't let parsing skip the 429 cooldown.
+      const data = await response.json().catch(() => ({}));
 
       if (response.ok) {
-        // Set success cooldown (60 seconds)
-        const cooldownTime = 60;
-        const expiry = Date.now() + cooldownTime * 1000;
-        localStorage.setItem("owl_cooldown_expiry", expiry.toString());
-        setCooldown(cooldownTime);
+        saveCooldown(60);
 
         setStatus("Message Sent Successfully!");
         setFormData({ name: "", email: "", message: "" });
         setSent(true);
       } else {
         // Set rate-limit cooldown (180 seconds) if 429 received
-        if (response.status === 429) {
-          const cooldownTime = 180;
-          const expiry = Date.now() + cooldownTime * 1000;
-          localStorage.setItem("owl_cooldown_expiry", expiry.toString());
-          setCooldown(cooldownTime);
-        }
+        if (response.status === 429) saveCooldown(180);
+        setIsError(true);
         setStatus(data.error || "Failed to send message. Please try again.");
       }
     } catch (error) {
       console.error("Error submitting contact form:", error);
+      setIsError(true);
       setStatus("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -187,7 +196,7 @@ export default function ContactForm() {
         </button>
 
         {status && !sent && (
-          <p className={`font-handwritten text-sm mt-3 ${status.includes("Failed") ? "text-blood-ink" : "text-ink-faded"}`}>
+          <p className={`font-handwritten text-sm mt-3 ${isError ? "text-blood-ink" : "text-ink-faded"}`}>
             {status}
           </p>
         )}

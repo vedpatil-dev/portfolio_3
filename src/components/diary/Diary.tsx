@@ -79,12 +79,13 @@ export default function Diary({ open, onClose }: DiaryProps) {
         } else if (targetCmd.id === "contact") {
           setAnswer({ title: "Send an Owl", type: "contact" });
         } else {
+          // Why: command ids are namespaced ("project:"/"experience:") in navigationCommands to stay unique.
           // Custom specific project/experience shortcut match
-          const proj = projectsData.projects.find((p) => p.slug === targetCmd.id);
+          const proj = projectsData.projects.find((p) => `project:${p.slug}` === targetCmd.id);
           if (proj) {
             setAnswer({ title: proj.name, type: "project", project: proj });
           } else {
-            const exp = experienceData.entries.find((e) => e.id === targetCmd.id);
+            const exp = experienceData.entries.find((e) => `experience:${e.id}` === targetCmd.id);
             if (exp) {
               setAnswer({ title: `${exp.company} — ${exp.role}`, type: "experience", experience: exp });
             }

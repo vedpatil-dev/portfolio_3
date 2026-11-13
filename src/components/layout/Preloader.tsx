@@ -25,18 +25,21 @@ export default function Preloader() {
       }
     }, 300);
 
-    // Minimum preloader time of 3.8 seconds for cinematic feel
+    // Why: exitTimer lives in effect scope so cleanup can clear it on unmount
+    // (a cleanup returned from inside a timeout callback never runs).
+    // Minimum preloader time of 2s before fading out.
+    let exitTimer: ReturnType<typeof setTimeout>;
     const timer = setTimeout(() => {
       setFade(true);
-      const exitTimer = setTimeout(() => {
+      exitTimer = setTimeout(() => {
         setLoading(false);
       }, 700); // matches fade-out transition duration
-      return () => clearTimeout(exitTimer);
     }, 2000);
 
     return () => {
       clearInterval(interval);
       clearTimeout(timer);
+      clearTimeout(exitTimer);
     };
   }, []);
 

@@ -42,27 +42,67 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
+// Why: user input is interpolated into an HTML email; escape it so crafted
+// markup / attribute breakouts cannot render in the owner's mail client.
+// Impact: all name/email/message values in emailHtml are inert text.
+const escapeHtml = (s: string) =>
+  s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+// Why: server-side bounds; client-side `type=email`/required are bypassable.
+// Impact: rejects non-string, oversized, or malformed payloads with 400.
+const MAX_NAME = 100;
+const MAX_EMAIL = 254;
+const MAX_MESSAGE = 5000;
+const EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
+
 export async function POST(request: Request) {
   try {
-    // Rate Limiting Check
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    }
+    const { name: rawName, email: rawEmail, message: rawMessage } = (body ?? {}) as Record<string, unknown>;
+
+    if (typeof rawName !== "string" || typeof rawEmail !== "string" || typeof rawMessage !== "string") {
+      return NextResponse.json(
+        { error: "Name, email, and message are required fields." },
+        { status: 400 }
+      );
+    }
+    // Why: strip CR/LF/quotes so the value is safe in the From display name and subject (header injection / sender spoofing).
+    const name = rawName.replace(/[\r\n"<>]+/g, " ").trim();
+    const email = rawEmail.trim();
+    const message = rawMessage.trim();
+
+    if (!name || !email || !message) {
+      return NextResponse.json(
+        { error: "Name, email, and message are required fields." },
+        { status: 400 }
+      );
+    }
+    if (name.length > MAX_NAME || email.length > MAX_EMAIL || message.length > MAX_MESSAGE || !EMAIL_RE.test(email)) {
+      return NextResponse.json(
+        { error: "Please provide a valid name, email, and a shorter message." },
+        { status: 400 }
+      );
+    }
+
+    // Why: rate limit runs after validation so malformed requests don't burn a legitimate user's quota.
+    // Impact: x-real-ip (set by the platform proxy) is preferred over the client-spoofable
+    // x-forwarded-for; unknown clients share one bucket.
+    // ponytail: in-memory per-instance limit; use a shared store (Redis/Upstash) if abuse appears.
     const headersList = await headers();
     const forwardedFor = headersList.get("x-forwarded-for");
-    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
+    const ip =
+      headersList.get("x-real-ip") ||
+      (forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1");
 
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { error: "Too many owls sent. Please wait a few minutes before sending another." },
         { status: 429 }
-      );
-    }
-
-    const { name, email, message } = await request.json();
-
-    // Basic Validation
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: "Name, email, and message are required fields." },
-        { status: 400 }
       );
     }
 
@@ -96,13 +136,13 @@ export async function POST(request: Request) {
           🦉 An Owl Has Arrived!
         </h2>
         <p style="margin: 16px 0; font-size: 15px;">
-          <strong>Sender:</strong> ${name}
+          <strong>Sender:</strong> ${escapeHtml(name)}
         </p>
         <p style="margin: 16px 0; font-size: 15px;">
-          <strong>Email:</strong> <a href="mailto:${email}" style="color: #967331; text-decoration: none; border-bottom: 1px dotted #967331;">${email}</a>
+          <strong>Email:</strong> <a href="mailto:${escapeHtml(email)}" style="color: #967331; text-decoration: none; border-bottom: 1px dotted #967331;">${escapeHtml(email)}</a>
         </p>
         <div style="background-color: rgba(214,189,137,0.15); border-left: 4px solid #b9955b; padding: 16px; margin: 24px 0; font-style: italic; white-space: pre-wrap; line-height: 1.6; font-size: 16px;">
-          ${message}
+          ${escapeHtml(message)}
         </div>
         <p style="font-size: 12px; color: #59402b; margin-top: 32px; border-top: 1px solid #e6dcc5; padding-top: 12px; text-align: right; font-style: italic; opacity: 0.8;">
           ~ Mischief Managed • Developer Journal ~

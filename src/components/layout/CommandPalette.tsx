@@ -18,7 +18,9 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const filtered = query.trim()
     ? COMMANDS.filter((c) =>
         c.label.toLowerCase().includes(query.toLowerCase()) ||
-        c.id.toLowerCase().includes(query.toLowerCase())
+        c.id.toLowerCase().includes(query.toLowerCase()) ||
+        // Why: palette promises tech search; tags were built but never matched (mirrors Diary.tsx).
+        (c as any).tags?.some((t: string) => t.toLowerCase().includes(query.toLowerCase()))
       )
     : COMMANDS;
 
