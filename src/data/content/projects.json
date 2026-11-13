@@ -1,6 +1,22 @@
 {
   "projects": [
     {
+      "id": "butler",
+      "slug": "butler",
+      "name": "Butler — Personal AI Coding Agent",
+      "summary": "A local-first AI coding agent that unifies local NPU/GPU inference and cloud coding agents behind a single terminal interface.",
+      "features": [
+        "Multi-provider model selection with hardware-aware inference across Ollama, FastFlowLM, Claude, Codex, and Antigravity",
+        "Agent orchestration across different execution backends",
+        "Workspace isolation and approval-based file operations",
+        "Controlled, sandboxed command execution for safer agent interactions"
+      ],
+      "image": "/projects/butler.png",
+      "gitLink": "https://github.com/vedpatil-dev/Butler-Your-personal-AI-operator",
+      "demoLink": "",
+      "techStack": ["Python", "FastAPI", "Ollama", "FastFlowLM", "CLI"]
+    },
+    {
       "id": "conduit",
       "slug": "conduit",
       "name": "Conduit — CI/CD Visibility Platform (Ongoing)",
