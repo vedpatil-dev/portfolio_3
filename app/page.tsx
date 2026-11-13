@@ -1,14 +1,17 @@
 import Link from "next/link";
+import Image from "next/image";
 import MapShell from "@/src/components/layout/MapShell";
+import HeroMap from "@/src/components/home/HeroMap";
 import profileData from "@/src/data/content/profile.json";
 import socialData from "@/src/data/content/social.json";
 import aboutData from "@/src/data/content/about.json";
 import projectsData from "@/src/data/content/projects.json";
 import experienceData from "@/src/data/content/experience.json";
-import { Mail, ArrowRight, Briefcase, Trophy, User } from "lucide-react";
+import { Mail, ArrowRight } from "lucide-react";
 import { FaGithub as Github, FaLinkedin as Linkedin } from "react-icons/fa";
-import ThemeLogo from "@/src/components/layout/ThemeLogo";
 import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
+import ResumeButton from "@/src/components/resume/ResumeButton";
+import Footprints from "@/src/components/map/Footprints";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -20,238 +23,134 @@ export const metadata: Metadata = {
   },
 };
 
+// Core stack shown in the hero (same technologies named in the site's SEO description).
+const CORE_STACK = ["React", "Next.js", "Java", "Spring Boot", "PostgreSQL"];
+
 export default function Home() {
+  // Why: replace three stacked duplicate cards with a focused composition:
+  // hero → selected works → current role → invitation to explore.
   const featuredProjects = projectsData.projects.slice(0, 3);
-  const recentExperience = experienceData.entries.slice(0, 3);
+  const [current, intern] = experienceData.entries;
+  const education = aboutData.education[0];
+
+  const pins = [
+    { label: education.degree, detail: `${education.institution} · ${education.duration}` },
+    { label: intern.role, detail: `${intern.company.replace(" (Internship)", "")} · ${intern.duration}` },
+    { label: current.role, detail: `${current.company} · ${current.duration}` },
+  ];
 
   return (
     <MapShell>
-      {/* ── HERO SECTION ─────────────────────────────────────────────── */}
-      <section
-        className="map-section relative flex flex-col items-center justify-center text-center overflow-hidden min-h-[calc(100vh-120px)] py-12"
-        aria-labelledby="hero-title"
-      >
-        {/* Map coordinate label top-left */}
-        <div className="absolute top-6 left-6 text-left pointer-events-none select-none" aria-hidden="true">
-          <p className="map-coord-mark text-xs">LAT: 19°04′N</p>
-          <p className="map-coord-mark text-xs">LON: 72°51′E</p>
-          <p className="map-coord-mark text-xs mt-1 opacity-60">Ahmedabad · India</p>
-        </div>
-
-        {/* Rust / water stain blotch decorations */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: "15%", left: "5%", width: 80, height: 60,
-            background: "radial-gradient(ellipse, rgba(122,59,30,0.12) 0%, transparent 70%)",
-            borderRadius: "50%",
-          }}
-          aria-hidden="true"
-        />
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            bottom: "20%", right: "8%", width: 120, height: 90,
-            background: "radial-gradient(ellipse, rgba(104,29,24,0.08) 0%, transparent 70%)",
-            borderRadius: "50%",
-          }}
-          aria-hidden="true"
-        />
-
-        {/* ── MAIN HERO CONTENT ── */}
-        <div className="relative z-10 max-w-2xl mx-auto px-6 opacity-0 translate-y-4 animate-map-fade-in">
-          {/* Themed Magic Logo - responsive scale */}
-          <div className="flex justify-center mb-4">
-            <ThemeLogo className="w-28 h-28 sm:w-24 sm:h-24 md:w-20 md:h-20" />
-          </div>
-
-          {/* Eyebrow label */}
-          <p className="font-handwritten text-sm text-leather font-semibold tracking-widest mb-3 opacity-90">
-            ✦ Full Stack Developer ✦
-          </p>
-
-          {/* Primary H1 Heading */}
-          <h1
-            id="hero-title"
-            className="font-display text-5xl sm:text-6xl md:text-7xl text-leather leading-tight mb-2"
-            style={{ textShadow: "1px 2px 6px rgba(16,11,8,0.12)" }}
-          >
-            {profileData.name}
-          </h1>
-
-          {/* Underline ornament */}
-          <div className="flex items-center justify-center gap-3 my-3" aria-hidden="true">
-            <div style={{ height: 1, width: 60, background: "linear-gradient(to right, transparent, #967331)" }} />
-            <span className="font-handwritten text-gold text-lg">⚜</span>
-            <div style={{ height: 1, width: 60, background: "linear-gradient(to left, transparent, #967331)" }} />
-          </div>
-
-          {/* Title */}
-          <p className="font-serif text-xl sm:text-2xl text-blood-ink font-bold mb-4 tracking-wide">
-            {profileData.title}
-          </p>
-
-          {/* Tagline */}
-          <div className="mb-8 flex justify-center w-full">
+      {/* ── HERO — The Beginning ── */}
+      <section className="page-container pt-6 md:pt-12 pb-12" aria-labelledby="hero-title">
+        <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-14 items-center">
+          <div className="animate-map-fade-in opacity-0">
+            <p className="eyebrow">The Beginning · Full Stack Developer</p>
+            <h1
+              id="hero-title"
+              className="font-display text-6xl sm:text-7xl lg:text-8xl text-leather leading-[0.95] mt-3"
+            >
+              {profileData.name}
+            </h1>
+            <div className="flex items-center gap-3 my-5" aria-hidden="true">
+              <div className="h-px w-16 bg-linear-to-r from-gold to-transparent" />
+              <span className="text-gold-text">⚜</span>
+            </div>
+            <p className="font-serif text-xl md:text-2xl text-blood-ink font-semibold leading-snug">
+              {profileData.title} building thoughtful digital experiences.
+            </p>
+            {/* Why: dragon-reactive text restored (it was dropped in the redesign). */}
             <InteractiveParagraph
-              text={`“${profileData.tagline}”`}
-              fontClass="font-handwritten text-lg text-ink font-semibold italic text-center leading-relaxed"
-              fontSpec="18px Caveat, cursive"
-              lineHeight={26}
+              className="mt-4 max-w-xl"
+              text={aboutData.bio[0]}
+              fontClass="prose-map prose-map-soft text-[1.25rem]"
+              fontSpec="20px Caveat, cursive"
             />
+
+            <ul className="flex flex-wrap gap-2 mt-5" aria-label="Core technologies">
+              {CORE_STACK.map((t) => (
+                <li key={t} className="skill-tag">{t}</li>
+              ))}
+            </ul>
+
+            <div className="flex flex-wrap items-center gap-3 mt-8">
+              <ResumeButton url={profileData.resumeUrl} />
+              <Link href="/projects" className="btn btn-secondary">
+                Explore Projects <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+              <Link href="/contact" className="link-quiet px-2">Get in touch</Link>
+            </div>
+
+            <div className="flex items-center gap-5 mt-6">
+              <a href={socialData.github} target="_blank" rel="noopener noreferrer" className="link-quiet" aria-label="GitHub profile">
+                <Github className="w-4 h-4" aria-hidden="true" /> GitHub
+              </a>
+              <a href={socialData.linkedin} target="_blank" rel="noopener noreferrer" className="link-quiet" aria-label="LinkedIn profile">
+                <Linkedin className="w-4 h-4" aria-hidden="true" /> LinkedIn
+              </a>
+              <a href={`mailto:${socialData.email}`} className="link-quiet" aria-label="Send email">
+                <Mail className="w-4 h-4" aria-hidden="true" /> Email
+              </a>
+            </div>
           </div>
 
-          {/* CTA buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
-            <Link
-              href="/about"
-              className="px-6 py-3 font-display text-sm tracking-wider text-leather border-2 border-parchment-dark/70 hover:border-gold rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-              style={{ background: "rgba(150, 115, 49, 0.35)" }}
-            >
-              About Ved Patil →
-            </Link>
-            <Link
-              href="/projects"
-              className="px-6 py-3 font-display text-sm tracking-wider text-leather border border-parchment-dark/50 hover:border-parchment-dark/80 rounded-sm transition-all duration-300"
-              style={{ background: "rgba(214, 189, 137, 0.65)" }}
-            >
-              Browse Projects
-            </Link>
-          </div>
-
-          {/* Social links */}
-          <div className="flex items-center justify-center gap-6 mt-10 pt-6 border-t border-parchment-dark/25">
-            <a
-              href={socialData.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 font-handwritten text-sm text-leather font-semibold hover:text-blood-ink transition-colors duration-200"
-              aria-label="GitHub profile"
-            >
-              <Github className="w-4 h-4 shrink-0 text-leather" />
-              <span>GitHub</span>
-            </a>
-            <span className="text-parchment-dark opacity-40" aria-hidden="true">·</span>
-            <a
-              href={socialData.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 font-handwritten text-sm text-leather font-semibold hover:text-blood-ink transition-colors duration-200"
-              aria-label="LinkedIn profile"
-            >
-              <Linkedin className="w-4 h-4 shrink-0 text-leather" />
-              <span>LinkedIn</span>
-            </a>
-            <span className="text-parchment-dark opacity-40" aria-hidden="true">·</span>
-            <a
-              href={`mailto:${socialData.email}`}
-              className="flex items-center gap-1.5 font-handwritten text-sm text-leather font-semibold hover:text-blood-ink transition-colors duration-200"
-              aria-label="Send email"
-            >
-              <Mail className="w-4 h-4 shrink-0 text-leather" />
-              <span>Email</span>
-            </a>
+          <div className="animate-map-fade-in opacity-0 [animation-delay:150ms] max-w-md w-full mx-auto lg:mx-0 lg:ml-auto">
+            <HeroMap pins={pins} />
           </div>
         </div>
       </section>
 
-      {/* ── SEMANTIC CONTENT SECTIONS FOR CRAWLABILITY ───────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 pb-16 space-y-12">
-        {/* ABOUT SECTION */}
-        <section aria-labelledby="about-heading" className="map-content-card p-6 md:p-8">
-          <div className="flex items-center gap-2 mb-4 border-b border-parchment-dark/25 pb-3">
-            <User className="w-5 h-5 text-blood-ink shrink-0" />
-            <h2 id="about-heading" className="font-display text-2xl md:text-3xl text-leather">
-              About Ved Patil
+      <Footprints />
+
+      {/* ── SELECTED WORKS ── */}
+      <section className="page-container py-10" aria-labelledby="works-heading">
+        <div className="flex items-end justify-between gap-4 mb-6">
+          <div>
+            <p className="eyebrow">The Workshop</p>
+            <h2 id="works-heading" className="section-title mt-1">Selected works</h2>
+          </div>
+          <Link href="/projects" className="link-quiet text-blood-ink font-semibold">
+            All projects <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {featuredProjects.map((p) => (
+            <Link key={p.id} href={`/projects/${p.slug}`} className="project-card artifact-card reveal block p-3 group">
+              <div className="shot-frame aspect-video">
+                <Image src={p.image} alt={`${p.name} screenshot`} fill sizes="(min-width: 768px) 360px, 100vw" className="object-cover object-top" />
+              </div>
+              <h3 className="font-serif font-semibold text-lg text-leather mt-3 leading-snug group-hover:text-blood-ink transition-colors">{p.name}</h3>
+              <p className="text-[0.92rem] text-ink-faded mt-1 line-clamp-2">{p.summary}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <Footprints />
+
+      {/* ── CURRENT ROLE ── */}
+      <section className="page-container py-10" aria-labelledby="journey-heading">
+        <div className="map-content-card reveal p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center">
+          <div>
+            <p className="eyebrow">My Journey</p>
+            <h2 id="journey-heading" className="section-title mt-1">
+              {current.role} at {current.company}
             </h2>
+            <p className="prose-map prose-map-soft mt-2 max-w-2xl">
+              {current.duration}. Started here as a {intern.role.toLowerCase()} ({intern.duration}) and moved into the full-time role.
+            </p>
           </div>
-          <div className="font-handwritten text-base md:text-lg text-ink-faded space-y-3 leading-relaxed">
-            {aboutData.bio.map((paragraph, idx) => (
-              <p key={idx}>{paragraph}</p>
-            ))}
-          </div>
-          <div className="mt-5 pt-3 border-t border-dashed border-parchment-dark/25">
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-1.5 font-display text-xs tracking-wider text-blood-ink hover:text-leather font-bold transition-colors"
-            >
-              <span>Learn more about Ved Patil&apos;s background & education</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </section>
+          <Link href="/experience" className="btn btn-secondary">Follow the route <ArrowRight className="w-4 h-4" aria-hidden="true" /></Link>
+        </div>
+      </section>
 
-        {/* FEATURED PROJECTS SECTION */}
-        <section aria-labelledby="projects-heading" className="map-content-card p-6 md:p-8">
-          <div className="flex items-center justify-between mb-4 border-b border-parchment-dark/25 pb-3">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-blood-ink shrink-0" />
-              <h2 id="projects-heading" className="font-display text-2xl md:text-3xl text-leather">
-                Featured Projects by Ved Patil
-              </h2>
-            </div>
-            <Link
-              href="/projects"
-              className="font-handwritten text-sm text-blood-ink hover:underline hidden sm:block"
-            >
-              View all projects →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 font-handwritten">
-            {featuredProjects.map((project) => (
-              <div
-                key={project.id}
-                className="p-4 rounded border border-parchment-dark/30 bg-parchment-light/40 flex flex-col justify-between"
-              >
-                <div>
-                  <h3 className="font-display text-lg text-blood-ink mb-1">{project.name}</h3>
-                  <p className="text-xs text-ink-faded leading-relaxed mb-3">{project.summary}</p>
-                </div>
-                <Link
-                  href={`/projects/${project.slug}`}
-                  className="text-xs text-blood-ink font-bold hover:underline flex items-center gap-1"
-                >
-                  <span>Examine Project</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* EXPERIENCE SECTION */}
-        <section aria-labelledby="experience-heading" className="map-content-card p-6 md:p-8">
-          <div className="flex items-center justify-between mb-4 border-b border-parchment-dark/25 pb-3">
-            <div className="flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-blood-ink shrink-0" />
-              <h2 id="experience-heading" className="font-display text-2xl md:text-3xl text-leather">
-                Professional Experience
-              </h2>
-            </div>
-            <Link
-              href="/experience"
-              className="font-handwritten text-sm text-blood-ink hover:underline hidden sm:block"
-            >
-              Full history →
-            </Link>
-          </div>
-          <div className="space-y-4 font-handwritten">
-            {recentExperience.map((exp) => (
-              <div key={exp.id} className="border-b border-dashed border-parchment-dark/20 pb-3 last:border-0 last:pb-0">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-display text-lg text-blood-ink inline">{exp.company}</h3>
-                    <span className="text-xs text-ink opacity-80 italic ml-2">— {exp.role}</span>
-                  </div>
-                  <span className="text-xs text-ink-faded opacity-70">{exp.duration}</span>
-                </div>
-                <p className="text-xs text-ink-faded mt-1">{exp.summary}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
+      {/* ── INVITATION ── */}
+      <section className="page-container pt-6 pb-16 text-center" aria-label="Contact invitation">
+        <p className="font-handwritten text-2xl text-ink-faded italic">
+          “I solemnly swear that I am up to no good.” — Let&apos;s build something worth the trouble.
+        </p>
+        <Link href="/contact" className="btn btn-primary mt-5">Send an owl <ArrowRight className="w-4 h-4" aria-hidden="true" /></Link>
+      </section>
     </MapShell>
   );
 }
-

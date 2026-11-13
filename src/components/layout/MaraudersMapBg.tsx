@@ -1,7 +1,7 @@
 export default function MaraudersMapBg() {
   return (
     <div 
-      className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none opacity-45"
+      className="map-bg fixed inset-0 z-0 pointer-events-none overflow-hidden select-none"
       aria-hidden="true"
     >
       <svg
@@ -443,7 +443,8 @@ export default function MaraudersMapBg() {
         </g>
 
         {/* ── COMPASS ROSE PRINTED IN THE MAP ── */}
-        <g transform="translate(1270, 220)" className="pointer-events-none select-none">
+        {/* Why: the printed compass competed with page content. Impact: reduced to a quiet supporting element. */}
+        <g transform="translate(1270, 220)" opacity="0.55" className="pointer-events-none select-none">
           {/* Outer rings */}
           <circle cx="90" cy="90" r="85" stroke="var(--ink-faded)" strokeWidth="1.2" strokeDasharray="4 4" fill="none" opacity="0.65" />
           <circle cx="90" cy="90" r="72" stroke="var(--parchment-dark)" strokeWidth="1" opacity="0.45" fill="none" />

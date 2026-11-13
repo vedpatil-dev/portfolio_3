@@ -28,9 +28,23 @@ interface AnswerData {
 interface DiaryAnswerProps {
   answer: AnswerData;
   onBack: () => void;
+  onOpenPage?: (route: string) => void;
 }
 
-export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
+// Maps an answer to the real page it summarises, so the diary can hand the visitor over to it.
+const routeFor = (a: AnswerData): string | null => {
+  switch (a.type) {
+    case "project": return a.project ? `/projects/${a.project.slug}` : "/projects";
+    case "projects": return "/projects";
+    case "experience": return a.experience ? `/experience#${a.experience.id}` : "/experience";
+    case "about": return "/about";
+    case "skills": return "/about#skills";
+    case "contact": return "/contact";
+    default: return null;
+  }
+};
+
+export default function DiaryAnswer({ answer, onBack, onOpenPage }: DiaryAnswerProps) {
   // Use state with the answer object itself as the key/tracker
   const [prevAnswer, setPrevAnswer] = useState<AnswerData | null>(null);
   const [preambleDone, setPreambleDone] = useState(false);
@@ -71,6 +85,10 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
     <div className="diary-answer-container w-full h-full flex flex-col justify-between select-text">
       {/* Riddle Preamble */}
       <div className="mb-4">
+        {/* Why: the answer stayed hidden until the whole preamble finished typing (3-4s). Impact: Skip reveals it now. */}
+        {!preambleDone && (
+          <button type="button" onClick={() => setPreambleDone(true)} className="diary-chip float-right ml-2">Skip ↵</button>
+        )}
         <DiaryWriter 
           text={getPreamble()} 
           onComplete={() => setPreambleDone(true)}
@@ -88,12 +106,16 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
           {/* Title */}
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-display text-blood-ink text-xl tracking-wide">{answer.title}</h3>
-            <button 
-              onClick={onBack} 
-              className="font-handwritten text-sm text-ink-faded hover:text-blood-ink border border-dashed border-[rgba(118,83,46,0.25)] px-2 py-0.5 rounded cursor-pointer transition-colors"
-            >
-              [ Return ]
-            </button>
+            <div className="flex items-center gap-2">
+              {onOpenPage && routeFor(answer) && (
+                <button type="button" onClick={() => onOpenPage(routeFor(answer)!)} className="diary-chip">
+                  Open page →
+                </button>
+              )}
+              <button type="button" onClick={onBack} className="diary-chip">
+                ← Back
+              </button>
+            </div>
           </div>
 
           {/* PROJECT DETAIL */}
@@ -167,7 +189,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
                   <div key={proj.id} className="py-3 first:pt-0">
                     <h4 className="font-display text-blood-ink text-lg">{proj.name}</h4>
                     <p className="text-sm text-ink-faded mb-1">{proj.summary}</p>
-                    <a href={proj.demoLink || proj.gitLink} target="_blank" rel="noopener noreferrer" className="text-xs text-blood-ink underline">
+                    <a href={proj.demoLink || proj.gitLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blood-ink underline">
                       Examine Artifact →
                     </a>
                   </div>
@@ -187,7 +209,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
                         <h4 className="font-display text-blood-ink text-lg">{exp.company}</h4>
                         <span className="text-sm italic text-ink">{exp.role}</span>
                       </div>
-                      <span className="text-xs opacity-60 text-right">{exp.duration}</span>
+                      <span className="text-sm opacity-80 text-right">{exp.duration}</span>
                     </div>
                     {exp.summary && (
                       <p className="text-sm text-ink-faded mt-1">{exp.summary}</p>
@@ -195,7 +217,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
                     {exp.skills && exp.skills.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {exp.skills.map((skill: string) => (
-                          <span key={skill} className="px-1.5 py-0.5 border border-[rgba(118,83,46,0.25)] rounded text-xs bg-gold/5">
+                          <span key={skill} className="px-1.5 py-0.5 border border-[rgba(118,83,46,0.25)] rounded text-sm bg-gold/5">
                             {skill}
                           </span>
                         ))}
@@ -232,7 +254,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
                   <strong className="text-blood-ink">Skills Applied:</strong>
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {answer.experience.skills.map((skill: string) => (
-                      <span key={skill} className="px-1.5 py-0.5 border border-[rgba(118,83,46,0.25)] rounded text-xs">
+                      <span key={skill} className="px-1.5 py-0.5 border border-[rgba(118,83,46,0.25)] rounded text-sm">
                         {skill}
                       </span>
                     ))}
@@ -343,7 +365,7 @@ export default function DiaryAnswer({ answer, onBack }: DiaryAnswerProps) {
                       <div key={p.id} className="py-2">
                         <span className="font-bold text-ink">{p.name}</span> — <span className="text-sm">{p.summary}</span>
                         <div className="mt-1">
-                          <a href={p.demoLink || p.gitLink} target="_blank" rel="noopener noreferrer" className="text-xs text-blood-ink underline">
+                          <a href={p.demoLink || p.gitLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blood-ink underline">
                             Examine Artifact →
                           </a>
                         </div>

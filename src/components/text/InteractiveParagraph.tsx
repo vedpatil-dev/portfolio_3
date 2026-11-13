@@ -98,45 +98,50 @@ export default function InteractiveParagraph({
     };
   }, [layoutKey, text]);
 
-  // 4. Animation loop for serpent deflection
+  // 4. Animation loop for dragon deflection
   useEffect(() => {
     let active = true;
 
     const tick = () => {
       if (!active) return;
 
-      const serpentPositions = (window as any).__serpentPositions;
-      const serpentOpacity = (window as any).__serpentOpacity ?? 0;
+      const dragonPositions = (window as any).__dragonPositions;
+      const dragonOpacity = (window as any).__dragonOpacity ?? 0;
 
       if (containerRef.current && wordsInfoRef.current.length > 0) {
-        const rect = containerRef.current.getBoundingClientRect();
+        const dragonActive =
+          dragonPositions && dragonPositions.length > 0 && dragonOpacity > 0.05;
+        // Why: getBoundingClientRect() ran every frame on every paragraph even with no dragon on screen.
+        // Impact: layout is only read while the dragon is active (the idle loop becomes nearly free).
+        const rect = dragonActive ? containerRef.current.getBoundingClientRect() : null;
 
-        if (
-          serpentPositions &&
-          serpentPositions.length > 0 &&
-          serpentOpacity > 0.05
-        ) {
-          const head = serpentPositions[0]; // Interact with the serpent's head
-          const localSerpentX = head.x - rect.left;
-          const localSerpentY = head.y - rect.top;
-
+        if (dragonActive && rect) {
+          // Why: only the dragon's head pushed words, so the body slid through text untouched.
+          // Impact: every 4th body segment acts as a (slightly weaker) repeller, so the whole snake parts the text.
+          // Cost: ~14 distance checks per word per frame, only while the dragon is visible.
           wordsInfoRef.current.forEach((word) => {
-            const dx = word.initialX - localSerpentX;
-            const dy = word.initialY - localSerpentY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            // Repulsion variables
             const radius = 80; // Interaction radius (px)
             const maxForce = 70; // Max displacement force (px)
 
             let targetX = 0;
             let targetY = 0;
+            let strongest = 0;
 
-            if (dist < radius) {
-              const force = (1 - dist / radius) * maxForce * serpentOpacity;
-              const angle = dist > 0.1 ? Math.atan2(dy, dx) : Math.random() * Math.PI * 2;
-              targetX = Math.cos(angle) * force;
-              targetY = Math.sin(angle) * force;
+            for (let i = 0; i < dragonPositions.length; i += 4) {
+              const seg = dragonPositions[i];
+              const dx = word.initialX - (seg.x - rect.left);
+              const dy = word.initialY - (seg.y - rect.top);
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist >= radius) continue;
+
+              const bodyFalloff = i === 0 ? 1 : 0.7; // head pushes hardest
+              const force = (1 - dist / radius) * maxForce * dragonOpacity * bodyFalloff;
+              if (force > strongest) {
+                strongest = force;
+                const angle = dist > 0.1 ? Math.atan2(dy, dx) : Math.random() * Math.PI * 2;
+                targetX = Math.cos(angle) * force;
+                targetY = Math.sin(angle) * force;
+              }
             }
 
             // Smooth interpolation (spring-like effect)
@@ -157,7 +162,7 @@ export default function InteractiveParagraph({
             }
           });
         } else {
-          // Smoothly return words to original positions if serpent is gone
+          // Smoothly return words to original positions if dragon is gone
           wordsInfoRef.current.forEach((word) => {
             if (
               Math.abs(word.currentX) > 0.05 ||
@@ -195,13 +200,16 @@ export default function InteractiveParagraph({
       className={`${className} ${fontClass} relative flex flex-wrap select-none`}
     >
       {words.map((word, wordIndex) => (
+        <React.Fragment key={wordIndex}>
         <span
-          key={wordIndex}
           className="interactive-word inline-block mr-1.5 shrink-0 cursor-default select-text"
           style={{ willChange: "transform, color" }}
         >
           {word}
         </span>
+        {/* Why: whitespace between inline-block spans keeps copy/paste and screen-reader text word-separated. */}
+        {" "}
+        </React.Fragment>
       ))}
     </div>
   );

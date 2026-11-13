@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 
 /**
- * CursorSerpent
+ * CursorDragon
  *
  * Performance strategy:
  * - 56 SVG segments instead of 120.
@@ -25,6 +25,14 @@ const SEGMENT_COUNT = 56;
  */
 const SEGMENT_SPACING = 7;
 
+/** Wings attach to this segment (just behind the neck). */
+const WING_INDEX = 8;
+
+/** Wing silhouette (left wing; the right wing is mirrored). Root at (0,-6), swept back. */
+const WING_PATH =
+  "M 2,-6 L -6,-40 Q -10,-30 -14,-34 Q -18,-24 -22,-27 Q -26,-16 -31,-16 Q -31,-9 -24,-6 Z";
+const WING_BONES = "M 2,-6 L -14,-34 M 0,-6 L -22,-27 M -2,-6 L -31,-16";
+
 /**
  * Maximum distance between recorded path-history points.
  * Keeping this below SEGMENT_SPACING makes path sampling smooth.
@@ -39,12 +47,12 @@ const MAX_PATH_LENGTH =
   SEGMENT_COUNT * SEGMENT_SPACING + 100;
 
 /**
- * Distance between the actual cursor and serpent head.
+ * Distance between the actual cursor and dragon head.
  */
 const CURSOR_OFFSET = 24;
 
 /**
- * Seconds before the serpent begins fading out.
+ * Seconds before the dragon begins fading out.
  */
 const IDLE_TIMEOUT = 3;
 
@@ -81,14 +89,14 @@ type SegmentPosition = {
 };
 
 interface CustomWindow extends Window {
-  __serpentPositions?: SegmentPosition[];
-  __serpentOpacity?: number;
+  __dragonPositions?: SegmentPosition[];
+  __dragonOpacity?: number;
 }
 
-export default function CursorSerpent() {
+export default function CursorDragon() {
   const [enabled, setEnabled] = React.useState<boolean>(() => {
     if (typeof window === "undefined") return true;
-    return localStorage.getItem("serpent_enabled") !== "false";
+    return localStorage.getItem("dragon_enabled") !== "false";
   });
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -98,13 +106,13 @@ export default function CursorSerpent() {
       if (typeof customEvent.detail?.enabled === "boolean") {
         setEnabled(customEvent.detail.enabled);
       } else if (typeof window !== "undefined") {
-        setEnabled(localStorage.getItem("serpent_enabled") !== "false");
+        setEnabled(localStorage.getItem("dragon_enabled") !== "false");
       }
     };
 
-    window.addEventListener("toggle-serpent", handleToggle);
+    window.addEventListener("toggle-dragon", handleToggle);
     return () => {
-      window.removeEventListener("toggle-serpent", handleToggle);
+      window.removeEventListener("toggle-dragon", handleToggle);
     };
   }, []);
 
@@ -113,6 +121,8 @@ export default function CursorSerpent() {
    * We mutate transforms directly instead of triggering React renders.
    */
   const segmentsRef = useRef<(SVGGElement | null)[]>([]);
+  const wingLRef = useRef<SVGGElement | null>(null);
+  const wingRRef = useRef<SVGGElement | null>(null);
 
   /**
    * Current pointer target.
@@ -166,6 +176,9 @@ export default function CursorSerpent() {
    * Visual opacity.
    */
   const opacityRef = useRef(0);
+  // Why: the dragon drew over form fields and distracted while typing. Impact: it dims to 15% while the
+  // pointer is over an input/textarea/select, and returns to full once the pointer leaves.
+  const overFieldRef = useRef(false);
 
   /**
    * Prevent multiple RAF loops from starting simultaneously.
@@ -188,8 +201,8 @@ export default function CursorSerpent() {
      */
     if (!enabled || !finePointerQuery.matches || reducedMotionQuery.matches) {
       if (typeof window !== "undefined") {
-        (window as unknown as CustomWindow).__serpentOpacity = 0;
-        (window as unknown as CustomWindow).__serpentPositions = [];
+        (window as unknown as CustomWindow).__dragonOpacity = 0;
+        (window as unknown as CustomWindow).__dragonPositions = [];
       }
       return;
     }
@@ -455,13 +468,19 @@ export default function CursorSerpent() {
           )}) rotate(${angleDegrees.toFixed(2)})`
         );
       }
+
+      // Why: wings flap while the dragon is visible. Impact: two attribute writes per frame, driven by the same rAF
+      // loop that already moves the body — no CSS animation (those kept running while the dragon was hidden).
+      const flap = Math.sin(performance.now() / 140) * 16;
+      wingLRef.current?.setAttribute("transform", `rotate(${(flap - 8).toFixed(1)} 0 -10)`);
+      wingRRef.current?.setAttribute("transform", `rotate(${(-(flap - 8)).toFixed(1)} 0 10)`);
     };
 
     /**
      * Main animation loop.
      *
      * Important:
-     * This loop completely stops once the serpent has faded out.
+     * This loop completely stops once the dragon has faded out.
      */
     const animate = (timestamp: number) => {
       if (!isAnimatingRef.current) return;
@@ -488,7 +507,7 @@ export default function CursorSerpent() {
       /**
        * Delta-time-independent opacity.
        */
-      const targetOpacity = isIdle ? 0 : 1;
+      const targetOpacity = isIdle ? 0 : overFieldRef.current ? 0.15 : 1;
 
       const fadeSpeed = isIdle
         ? FADE_OUT_SPEED
@@ -565,8 +584,8 @@ export default function CursorSerpent() {
       renderSegments();
 
       if (typeof window !== "undefined") {
-        (window as any).__serpentPositions = positionsRef.current;
-        (window as any).__serpentOpacity = opacityRef.current;
+        (window as any).__dragonPositions = positionsRef.current;
+        (window as any).__dragonOpacity = opacityRef.current;
       }
 
       animationFrameRef.current =
@@ -586,6 +605,7 @@ export default function CursorSerpent() {
     const handlePointerMove = (event: PointerEvent) => {
       pointerRef.current.x = event.clientX;
       pointerRef.current.y = event.clientY;
+      overFieldRef.current = !!(event.target as Element | null)?.closest?.("input,textarea,select,[contenteditable]");
 
       /**
        * performance.now() uses the same time origin as RAF timestamps.
@@ -642,7 +662,7 @@ export default function CursorSerpent() {
       isAnimatingRef.current = false;
 
       if (typeof window !== "undefined") {
-        (window as any).__serpentOpacity = 0;
+        (window as any).__dragonOpacity = 0;
       }
     };
   }, [enabled]);
@@ -728,207 +748,105 @@ export default function CursorSerpent() {
             >
               <g transform={`scale(${scale.toFixed(4)})`}>
                 {isTailTip ? (
+                  /* Spade-shaped dragon tail tip */
                   <path
-                    d="
-                      M -14,1.5
-                      C -8,1 -4,0.5 4,0
-                      Q 12,-1 18,-2.5
-                    "
-                    fill="none"
+                    d="M 6,0 L -2,-8 L -18,0 L -2,8 Z"
+                    fill="var(--blood-ink)"
+                    fillOpacity="0.55"
                     stroke="var(--ink)"
                     strokeWidth="1.2"
-                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 ) : (
-                  <g className="serpent-segment-animate">
+                  <g>
+                    {/* Armoured body segment */}
                     <ellipse
                       cx="0"
                       cy="0"
                       rx="13"
-                      ry="9.5"
-                      fill="none"
+                      ry="9"
+                      fill="var(--blood-ink)"
+                      fillOpacity="0.16"
                       stroke="var(--ink)"
                       strokeWidth="1.3"
                     />
-
-                    {/* Scale cross-hatching */}
+                    {/* Scale hatching */}
                     <path
-                      d="
-                        M -13,-3 C -6,-1 6,1 13,3
-                        M -13,3 C -6,1 6,-1 13,-3
-                        M -7,-8 C -3,-3 -3,3 -7,8
-                        M 7,-8 C 3,-3 3,3 7,8
-                      "
+                      d="M -13,-3 C -6,-1 6,1 13,3 M -13,3 C -6,1 6,-1 13,-3 M -7,-8 C -3,-3 -3,3 -7,8 M 7,-8 C 3,-3 3,3 7,8"
                       fill="none"
                       stroke="var(--ink-faded)"
                       strokeWidth="0.8"
-                      opacity="0.55"
+                      opacity="0.5"
                     />
-
-                    {/* Gold scale accents */}
-                    <path
-                      d="
-                        M -3,-3 L 0,-1 L 3,-3
-                        M -3,3 L 0,1 L 3,3
-                      "
-                      fill="none"
-                      stroke="var(--gold)"
-                      strokeWidth="0.8"
-                      opacity="0.45"
-                    />
+                    {/* Gold dorsal plate */}
+                    <path d="M -5,0 L 0,-3.2 L 5,0 L 0,3.2 Z" fill="var(--gold)" fillOpacity="0.6" stroke="var(--ink)" strokeWidth="0.6" />
+                    {/* Side spikes on alternating segments */}
+                    {index % 2 === 0 && (
+                      <path
+                        d="M -4,-9 L 0,-15 L 4,-9 M -4,9 L 0,15 L 4,9"
+                        fill="var(--ink)"
+                        fillOpacity="0.7"
+                        stroke="var(--ink)"
+                        strokeWidth="0.6"
+                        strokeLinejoin="round"
+                      />
+                    )}
                   </g>
+                )}
+                {/* Wings sit just behind the neck and flap from the JS loop (no CSS animation) */}
+                {index === WING_INDEX && (
+                  <>
+                    <g ref={wingLRef}>
+                      <g transform="scale(1.7)">
+                      <path d={WING_PATH} fill="var(--blood-ink)" fillOpacity="0.28" stroke="var(--ink)" strokeWidth="1.2" strokeLinejoin="round" />
+                      <path d={WING_BONES} fill="none" stroke="var(--ink)" strokeWidth="0.9" opacity="0.7" />
+                      </g>
+                    </g>
+                    <g ref={wingRRef}>
+                      <g transform="scale(1.7,-1.7)">
+                        <path d={WING_PATH} fill="var(--blood-ink)" fillOpacity="0.28" stroke="var(--ink)" strokeWidth="1.2" strokeLinejoin="round" />
+                        <path d={WING_BONES} fill="none" stroke="var(--ink)" strokeWidth="0.9" opacity="0.7" />
+                      </g>
+                    </g>
+                  </>
                 )}
               </g>
             </g>
           );
         })}
 
-        {/* Head — rendered last so it stays above the body. */}
+        {/* Dragon head — rendered last so it stays above the body. */}
         <g
           ref={(element) => {
             segmentsRef.current[0] = element;
           }}
         >
           <g transform="scale(1.15)">
-            <g className="serpent-segment-animate">
-              {/* Outer head silhouette */}
-              <path
-                d="
-                  M -13,0
-                  C -12,-5 -8,-8 -3,-8
-                  C 3,-8 10,-6 16,-1
-                  L 18,0
-                  L 16,1
-                  C 10,6 3,8 -3,8
-                  C -8,8 -12,5 -13,0
-                  Z
-                "
-                fill="none"
-                stroke="var(--ink)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-
-              {/* Head plate divisions */}
-              <path
-                d="
-                  M -8,-6 C -6,-3 -6,3 -8,6
-                  M -8,-3 C -4,-1 4,1 8,3
-                  M -8,3 C -4,1 4,-1 8,-3
-                "
-                fill="none"
-                stroke="var(--ink-faded)"
-                strokeWidth="0.8"
-                opacity="0.8"
-              />
-
-              <path
-                d="
-                  M -6,0 L 0,-4 L 6,0 L 0,4 Z
-                  M 0,-4 L 0,4
-                  M 6,0 L 12,0
-                "
-                fill="none"
-                stroke="var(--ink)"
-                strokeWidth="0.9"
-                opacity="0.75"
-              />
-
-              {/* Vintage stippling */}
-              <circle
-                cx="-10"
-                cy="-2"
-                r="0.5"
-                fill="var(--ink)"
-                opacity="0.6"
-              />
-
-              <circle
-                cx="-9"
-                cy="3"
-                r="0.4"
-                fill="var(--ink)"
-                opacity="0.6"
-              />
-
-              <circle
-                cx="-4"
-                cy="-4"
-                r="0.5"
-                fill="var(--ink)"
-                opacity="0.5"
-              />
-
-              <circle
-                cx="-2"
-                cy="4"
-                r="0.4"
-                fill="var(--ink)"
-                opacity="0.5"
-              />
-
-              <circle
-                cx="4"
-                cy="-5"
-                r="0.5"
-                fill="var(--ink)"
-                opacity="0.7"
-              />
-
-              <circle
-                cx="5"
-                cy="5"
-                r="0.4"
-                fill="var(--ink)"
-                opacity="0.7"
-              />
-
-              <circle
-                cx="11"
-                cy="-2"
-                r="0.4"
-                fill="var(--ink)"
-                opacity="0.6"
-              />
-
-              <circle
-                cx="12"
-                cy="2"
-                r="0.5"
-                fill="var(--ink)"
-                opacity="0.6"
-              />
-
-              {/* Forked tongue */}
-              <path
-                d="
-                  M 18,0 L 23,0
-                  M 23,0 C 25,-1.2 27,-2.2 30,-2.6
-                  M 23,0 C 25,1.2 27,2.2 30,2.6
-                "
-                fill="none"
-                stroke="var(--ink)"
-                strokeWidth="1.2"
-                strokeLinecap="round"
-              />
-            </g>
-
-            {/* Eyes */}
-            <circle
-              cx="3"
-              cy="-3"
-              r="1.3"
-              fill="var(--gold)"
-              className="serpent-glow"
+            {/* Swept-back horns */}
+            <path d="M -4,-7 C -10,-12 -16,-14 -23,-12 C -17,-10 -12,-7 -6,-5 Z" fill="var(--ink)" stroke="var(--ink)" strokeWidth="0.6" strokeLinejoin="round" />
+            <path d="M -4,7 C -10,12 -16,14 -23,12 C -17,10 -12,7 -6,5 Z" fill="var(--ink)" stroke="var(--ink)" strokeWidth="0.6" strokeLinejoin="round" />
+            {/* Cheek spikes */}
+            <path d="M -8,-7 L -12,-12 L -4,-8 M -8,7 L -12,12 L -4,8" fill="var(--ink)" fillOpacity="0.7" stroke="var(--ink)" strokeWidth="0.6" strokeLinejoin="round" />
+            {/* Skull and snout */}
+            <path
+              d="M -12,0 C -11,-6 -6,-8 0,-8 C 6,-8 12,-5 20,-3 L 24,-1.5 L 24,1.5 L 20,3 C 12,5 6,8 0,8 C -6,8 -11,6 -12,0 Z"
+              fill="var(--blood-ink)"
+              fillOpacity="0.22"
+              stroke="var(--ink)"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
             />
-
-            <circle
-              cx="3"
-              cy="3"
-              r="1.3"
-              fill="var(--gold)"
-              className="serpent-glow"
-            />
+            {/* Brow ridges, nose bridge and plates */}
+            <path d="M 1,-5.5 L 11,-4 M 1,5.5 L 11,4 M -8,0 L 18,0" fill="none" stroke="var(--ink-faded)" strokeWidth="0.9" opacity="0.8" />
+            {/* Teeth */}
+            <path d="M 13,3.4 l 1.4,2.6 l 1.4,-2.6 M 17.5,2.6 l 1.2,2.2 l 1.2,-2.2 M 13,-3.4 l 1.4,-2.6 l 1.4,2.6 M 17.5,-2.6 l 1.2,-2.2 l 1.2,2.2" fill="var(--parchment-light)" stroke="var(--ink)" strokeWidth="0.6" strokeLinejoin="round" />
+            {/* Nostrils */}
+            <circle cx="21" cy="-0.9" r="0.6" fill="var(--ink)" />
+            <circle cx="21" cy="0.9" r="0.6" fill="var(--ink)" />
+            {/* Ember eyes with slit pupils */}
+            <circle cx="6" cy="-4" r="1.7" fill="var(--gold)" className="dragon-glow" />
+            <circle cx="6" cy="4" r="1.7" fill="var(--gold)" className="dragon-glow" />
+            <path d="M 6,-5.3 L 6,-2.7 M 6,2.7 L 6,5.3" stroke="var(--ink)" strokeWidth="0.7" />
           </g>
         </g>
       </svg>

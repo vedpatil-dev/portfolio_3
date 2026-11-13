@@ -1,27 +1,49 @@
 @import "tailwindcss";
 
+/* ─── DESIGN TOKENS ──────────────────────────────────────────────────────────
+   Why: palette moved from bright tan to muted, aged parchment so text contrast is
+   calmer and the surface looks old rather than dirty.
+   Impact: legacy token names (--parchment, --ink, --gold …) are kept so every
+   existing page/component inherits the new palette without markup changes.     */
 :root {
   --background: #c8a96e;
   --foreground: #21170f;
-  
-  /* Aged Rusted Map Color Palette */
+
+  /* Parchment surfaces */
   --parchment-light: #d6bd89;
   --parchment: #b9955b;
   --parchment-dark: #76532e;
+  --paper-shadow: #8c704b;
+
+  /* Ink */
   --ink: #21170f;
   --ink-faded: #59402b;
   --blood-ink: #681d18;
   --leather: #28170f;
   --leather-light: #51301e;
+
+  /* Accents */
   --gold: #967331;
-  --shadow: #100b08;
-  
-  /* Rust / aged metal tones */
+  --gold-text: #5c4312; /* darker gold for small text */ /* gold dark enough for small text on parchment (AA) */
   --rust: #7a3b1e;
   --rust-light: #a0522d;
   --rust-dark: #4a1e0a;
   --verdigris: #3d5a47;
+  --shadow: #100b08;
   --map-bg: #b8956a;
+
+  /* Surface system — shared by every card/note */
+  --surface-bg: linear-gradient(160deg, #dcc593 0%, #d2b97f 100%);
+  --surface-border: rgba(118, 83, 46, 0.45);
+  --surface-radius: 4px;
+  --surface-shadow: 0 1px 2px rgba(48, 37, 29, 0.18), 0 8px 22px -8px rgba(48, 37, 29, 0.35);
+  --surface-shadow-hover: 0 2px 4px rgba(48, 37, 29, 0.2), 0 16px 32px -10px rgba(48, 37, 29, 0.42);
+  --surface-highlight: inset 0 1px 0 rgba(255, 248, 230, 0.55), inset 0 0 28px rgba(140, 112, 75, 0.12);
+
+  /* Layout rhythm */
+  --page-max: 72rem;
+  --space-section: clamp(2.5rem, 6vw, 5rem);
+  --focus-ring: 0 0 0 2px var(--parchment-light), 0 0 0 4px var(--blood-ink);
 }
 
 @theme {
@@ -34,38 +56,47 @@
   --color-leather: var(--leather);
   --color-leather-light: var(--leather-light);
   --color-gold: var(--gold);
+  --color-gold-text: var(--gold-text);
   --color-shadow: var(--shadow);
   --color-rust: var(--rust);
   --color-rust-light: var(--rust-light);
   --color-rust-dark: var(--rust-dark);
   --color-verdigris: var(--verdigris);
   --color-map-bg: var(--map-bg);
-  
-  /* ── 2 fonts only ── */
-  /* Pirata One: pirate map style — all headings, titles, nav, chapter labels */
+
+  /* Original two-font identity kept at the owner's request: Pirata One (display) + Caveat (everything else). */
   --font-display: var(--font-pirata), 'Times New Roman', serif;
-  /* Caveat: handwriting — all body text, descriptions, notes, inputs */
-  --font-sans: var(--font-caveat), cursive;
-  --font-mono: var(--font-caveat), cursive;
   --font-serif: var(--font-caveat), cursive;
+  --font-sans: var(--font-caveat), cursive;
   --font-handwritten: var(--font-caveat), cursive;
 }
 
-/* ─── RUSTED MAP BACKGROUND ───────────────────────────────────────────────── */
+html { font-size: 112.5%; } /* Caveat runs small; scales rem-based text up for readability */
 html, body {
   min-height: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
 }
 
+/* ─── AGED PARCHMENT BACKGROUND ──────────────────────────────────────────────
+   Why: replaced 11 stacked radial gradients + fixed attachment with a small set of
+   soft stains, an edge vignette and one grain layer, painted on a fixed pseudo-element.
+   Impact: fewer layers to composite, no scroll repaints from background-attachment:fixed,
+   and a calm centre so body text never sits on strong stains.                        */
 body {
   color: var(--foreground);
-  /* Caveat is the default body / handwriting font */
   font-family: var(--font-caveat), cursive;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
   background-color: #eed6b0;
-  /* Layered rusted map: bright center parchment glow + heavy rust spots + edge burn. */
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     /* Parchment center glow fading to dark borders */
     radial-gradient(circle at center, rgba(248, 230, 200, 0.88) 0%, rgba(214, 189, 137, 0.52) 45%, rgba(164, 129, 80, 0.35) 75%, rgba(12, 6, 3, 0.86) 100%),
@@ -91,12 +122,27 @@ body {
     radial-gradient(ellipse at 50% 100%, rgba(35, 15, 5, 0.55) 0%, transparent 35%),
     /* SVG paper grain noise */
     url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='mapNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.3 0 0 0 0 0.12 0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23mapNoise)'/%3E%3C/svg%3E");
-  background-attachment: fixed;
+}
+
+/* Why: map labels/footprints ran straight through headings and body copy.
+   Impact: the illustration is softened in the centre (where content sits) and stays vivid at the edges,
+   keeping the map identity while keeping text readable. Static mask: no per-frame cost. */
+.map-bg {
+  opacity: 0.45;
+  transform: translateZ(0); /* promote the static SVG (incl. its turbulence filter) to its own layer: rasterised once, not on scroll */
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(0,0,0,0.25) 0%, #000 100%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(0,0,0,0.25) 0%, #000 100%);
+}
+
+/* Visible keyboard focus everywhere (was missing) */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 2px;
 }
 
 /* ─── MAP SECTION LAYOUT ─────────────────────────────────────────────────── */
 
-/* Full-screen section slide */
 .map-section {
   position: relative;
   min-height: 100vh;
@@ -108,39 +154,60 @@ body {
   overflow: hidden;
 }
 
-/* Content card on top of map bg — aged parchment card */
-.map-content-card {
+/* ─── SURFACES ───────────────────────────────────────────────────────────────
+   Why: .map-content-card and .artifact-card were two near-duplicate translucent cards.
+   Impact: one opaque, layered parchment surface (border + soft shadow + inner
+   highlight + folded corner). .artifact-card is kept as an alias for the lift on hover.
+   Removed backdrop-filter: it blurred stains behind text and is costly to paint.     */
+.map-content-card,
+.artifact-card {
   position: relative;
-  background-color: rgba(214, 189, 137, 0.82);
-  background-image:
-    radial-gradient(circle at 20% 25%, rgba(122, 59, 30, 0.07) 0%, transparent 35%),
-    radial-gradient(circle at 80% 75%, rgba(118, 83, 46, 0.09) 0%, transparent 30%),
-    radial-gradient(circle at 55% 10%, rgba(100, 70, 30, 0.06) 0%, transparent 20%);
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
-  border: 1px solid rgba(118, 83, 46, 0.4);
-  border-radius: 3px;
-  box-shadow:
-    0 4px 24px rgba(16, 11, 8, 0.35),
-    0 1px 4px rgba(16, 11, 8, 0.25),
-    inset 0 0 30px rgba(118, 83, 46, 0.10);
+  background-color: var(--parchment-light);
+  background-image: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--surface-radius);
+  box-shadow: var(--surface-shadow), var(--surface-highlight);
   overflow: hidden;
 }
 
-/* Corner fold effect on cards */
-.map-content-card::after {
+/* Folded corner */
+.map-content-card::after,
+.artifact-card::after {
   content: '';
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(225deg, rgba(89, 64, 43, 0.5) 0%, rgba(176, 145, 80, 0.3) 100%);
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(315deg, rgba(140, 112, 75, 0.55) 0%, rgba(140, 112, 75, 0.12) 52%, transparent 53%);
   pointer-events: none;
 }
 
-/* ─── PIRATE MAP TOP NAVIGATION ─────────────────────────────────────────── */
+.artifact-card {
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+@media (hover: hover) {
+  .artifact-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--surface-shadow-hover), var(--surface-highlight);
+  }
+}
+
+/* Note: a slightly darker slip of paper "pinned" on the map, for annotations */
+.map-note {
+  background-color: var(--parchment);
+  background-image: linear-gradient(160deg, #dcc7a1 0%, #d2bb94 100%);
+  border: 1px solid var(--surface-border);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(48, 37, 29, 0.18), 0 4px 10px -4px rgba(48, 37, 29, 0.3);
+  padding: 0.75rem 1rem;
+}
+
+/* ─── MAP NAVIGATION ─────────────────────────────────────────────────────────
+   Why: refined strip, larger labels, 44px+ touch targets, and an active state that
+   does not depend on colour alone (filled wax-seal icon + X mark + underlined label).
+   Impact: desktop = top strip, mobile = bottom strip (safe-area aware).             */
 
 .map-nav {
   position: fixed;
@@ -148,43 +215,37 @@ body {
   left: 0;
   right: 0;
   z-index: 100;
-  
-  /* Aged parchment strip */
-  background-color: #d6bd89;
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: var(--parchment-light);
   background-image:
-    radial-gradient(circle at 10% 50%, rgba(122, 59, 30, 0.25) 0%, transparent 35%),
-    radial-gradient(circle at 90% 50%, rgba(122, 59, 30, 0.25) 0%, transparent 35%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stripNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.5 0 0 0 0 0.35 0 0 0 0 0.15 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stripNoise)'/%3E%3C/svg%3E");
-  border-top: 2px solid rgba(89, 64, 43, 0.6);
-  box-shadow:
-    0 -4px 15px rgba(16, 11, 8, 0.35),
-    inset 0 2px 6px rgba(118, 83, 46, 0.2);
+    linear-gradient(180deg, rgba(255, 248, 230, 0.35), transparent 40%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.35 0 0 0 0 0.15 0 0 0 0.14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  border-top: 1px solid rgba(129, 80, 47, 0.5);
+  box-shadow: 0 -6px 18px -6px rgba(48, 37, 29, 0.4), inset 0 1px 0 rgba(255, 248, 230, 0.5);
 }
 
 @media (min-width: 768px) {
   .map-nav {
     bottom: auto;
     top: 0;
+    padding-bottom: 0;
     border-top: none;
-    border-bottom: 2px solid rgba(89, 64, 43, 0.6);
-    box-shadow:
-      0 4px 15px rgba(16, 11, 8, 0.35),
-      inset 0 -2px 6px rgba(118, 83, 46, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(129, 80, 47, 0.5);
+    box-shadow: 0 6px 18px -6px rgba(48, 37, 29, 0.4), inset 0 -1px 0 rgba(255, 248, 230, 0.4);
   }
 }
 
-/* Torn bottom edge on nav */
+/* Torn outer edge (faces the page content) */
 .map-nav::after {
   content: '';
   position: absolute;
   top: -6px;
-  bottom: auto;
   left: 0;
   right: 0;
   height: 7px;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 7' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 Q10,7 20,3 Q30,0 40,5 Q50,7 60,2 Q70,0 80,4 Q90,7 100,1 Q110,0 120,6 Q130,7 140,2 Q150,0 160,5 Q170,7 180,1 Q190,0 200,4 Q210,7 220,2 Q230,0 240,6 Q250,7 260,3 Q270,0 280,5 Q290,7 300,1 Q310,0 320,4 Q330,7 340,2 Q350,0 360,5 Q370,7 380,3 Q390,0 400,4 L400,0 Z' fill='%23d6bd89'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 7' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 Q10,7 20,3 Q30,0 40,5 Q50,7 60,2 Q70,0 80,4 Q90,7 100,1 Q110,0 120,6 Q130,7 140,2 Q150,0 160,5 Q170,7 180,1 Q190,0 200,4 Q210,7 220,2 Q230,0 240,6 Q250,7 260,3 Q270,0 280,5 Q290,7 300,1 Q310,0 320,4 Q330,7 340,2 Q350,0 360,5 Q370,7 380,3 Q390,0 400,4 L400,0 Z' fill='%23e5d4b5'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
+  background-size: 400px 7px;
   transform: rotate(180deg);
   pointer-events: none;
 }
@@ -197,7 +258,6 @@ body {
   }
 }
 
-/* SVG connector paths between nav icons */
 .nav-path-svg {
   position: absolute;
   top: 0;
@@ -211,70 +271,74 @@ body {
 .nav-path-line {
   fill: none;
   stroke: var(--blood-ink);
-  stroke-width: 2.2;
-  stroke-dasharray: 5 6;
-  opacity: 0.8;
-  filter: drop-shadow(1px 1px 0px rgba(214, 189, 137, 0.4));
+  stroke-width: 1.6;
+  stroke-dasharray: 4 6;
+  opacity: 0.55;
 }
 
-/* Nav location marker */
 .nav-location {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  min-width: 56px;
+  min-height: 56px; /* ≥44px touch target */
+  padding: 2px 4px;
   cursor: pointer;
-  transition: transform 0.25s ease;
   text-decoration: none;
   z-index: 1;
+  color: var(--ink-faded);
+  transition: transform 0.25s ease, color 0.2s ease;
 }
 
-.nav-location:hover {
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .nav-location:hover { transform: translateY(-2px); color: var(--blood-ink); }
 }
 
 .nav-location-icon {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1.5px solid rgba(118, 83, 46, 0.7);
-  background: rgba(214, 189, 137, 0.85);
-  font-size: 1.1rem;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 5px rgba(16, 11, 8, 0.25);
-}
-
-.nav-location.active .nav-location-icon {
-  background: rgba(214, 189, 137, 0.95);
-  border-color: var(--blood-ink);
-  box-shadow: 0 0 10px rgba(104, 29, 24, 0.45), 0 2px 5px rgba(16, 11, 8, 0.35);
+  border: 1.5px solid rgba(129, 80, 47, 0.65);
+  background: var(--parchment-light);
+  color: currentColor;
+  box-shadow: 0 2px 4px rgba(48, 37, 29, 0.25), inset 0 1px 0 rgba(255, 248, 230, 0.6);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-location:hover .nav-location-icon {
-  background: rgba(226, 203, 160, 0.95);
   border-color: var(--gold);
-  box-shadow: 0 0 6px rgba(150, 115, 49, 0.4);
+}
+
+/* Active: filled burgundy wax seal with gold ring — shape + fill change, not only hue */
+.nav-location.active { color: var(--blood-ink); }
+.nav-location.active .nav-location-icon {
+  background: var(--blood-ink);
+  color: var(--parchment-light);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(150, 115, 49, 0.35), 0 3px 8px rgba(104, 29, 24, 0.45);
 }
 
 .nav-location-label {
-  /* Pirata One: pirate map style labels */
   font-family: var(--font-pirata), 'Times New Roman', serif;
-  font-size: 0.72rem;
-  color: var(--ink-faded);
-  text-align: center;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
   white-space: nowrap;
-  letter-spacing: 0.06em;
-  transition: color 0.2s ease;
-  line-height: 1.2;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+@media (hover: hover) {
+  .nav-location:hover .nav-location-label { border-bottom-color: var(--gold); }
 }
 
 .nav-location.active .nav-location-label {
-  color: var(--blood-ink);
-  font-weight: 700;
+  border-bottom-color: var(--blood-ink);
 }
 
 /* ─── HERO SECTION ───────────────────────────────────────────────────────── */
@@ -295,18 +359,6 @@ body {
   opacity: 0.6;
 }
 
-/* Compass rose decoration */
-.compass-rose {
-  animation: compass-slow-spin 60s linear infinite;
-  transform-origin: center;
-  opacity: 0.2;
-}
-
-@keyframes compass-slow-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
 /* Ink fade-in animation */
 @keyframes ink-appear {
   0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
@@ -321,7 +373,7 @@ body {
 
 .chapter-number {
   font-family: var(--font-handwritten), cursive;
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: var(--ink-faded);
   letter-spacing: 0.15em;
   margin-bottom: 0.75rem;
@@ -379,8 +431,8 @@ body {
 /* Coordinate marks like on a real map */
 .map-coord-mark {
   font-family: var(--font-handwritten), cursive;
-  font-size: 0.55rem;
-  color: rgba(89, 64, 43, 0.45);
+  font-size: 0.8rem; /* was 0.55rem — illegible */
+  color: rgba(90, 68, 48, 0.7);
   letter-spacing: 0.05em;
   -webkit-user-select: none;
   user-select: none;
@@ -417,28 +469,18 @@ body {
 
 /* ─── CURSOR SERPENT ─────────────────────────────────────────────────────── */
 
-.serpent-glow {
+.dragon-glow {
   filter: drop-shadow(0 0 2px var(--gold));
 }
 
-.serpent-segment-animate {
-  animation: ink-drift 3s ease-in-out infinite alternate;
-}
+/* Why: an infinite 1px "drift" CSS animation ran on all 56 dragon segments even while the dragon was invisible
+   (Lighthouse: 65 non-composited animations). Impact: removed — segments are moved only by the JS loop, and only
+   while the dragon is visible. */
 
 /* ── FONTS ──────────────────────────────────────────────────────────────── */
-/* Only 2 fonts used site-wide:                                              */
-/*   .font-display  → Pirata One (pirate map style)                         */
-/*   .font-handwritten / .font-serif / .font-sans → Caveat (handwriting)    */
-
-.font-serif {
-  font-family: var(--font-caveat), cursive;
-}
-.font-display {
-  font-family: var(--font-pirata), 'Times New Roman', serif;
-}
-.font-handwritten {
-  font-family: var(--font-caveat), cursive;
-}
+/* .font-serif / .font-sans come from the @theme tokens above (both Caveat).  */
+.font-display { font-family: var(--font-pirata), 'Times New Roman', serif; }
+.font-handwritten { font-family: var(--font-caveat), cursive; }
 
 /* ─── ANTIQUE SCROLLBAR ──────────────────────────────────────────────────── */
 
@@ -448,7 +490,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background-color: rgba(155, 118, 65, 0.4);
+  background-color: rgba(182, 154, 112, 0.5);
   border-left: 1px solid rgba(118, 83, 46, 0.25);
 }
 
@@ -486,36 +528,18 @@ body {
   animation: fade-in 0.4s ease forwards;
 }
 
-/* Skill tag */
+/* Skill / tech tag — sans for technical info */
 .skill-tag {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
-  background: rgba(150, 115, 49, 0.18);
-  border: 1px solid rgba(118, 83, 46, 0.35);
+  background: rgba(150, 115, 49, 0.16);
+  border: 1px solid rgba(129, 80, 47, 0.35);
   border-radius: 2px;
-  font-family: var(--font-handwritten), cursive;
+  font-family: var(--font-caveat), cursive;
   font-size: 0.78rem;
-  color: var(--ink-faded);
-}
-
-/* Project artifact card */
-.artifact-card {
-  background-color: rgba(214, 189, 137, 0.7);
-  background-image:
-    radial-gradient(circle at 15% 20%, rgba(122, 59, 30, 0.06) 0%, transparent 30%),
-    radial-gradient(circle at 85% 80%, rgba(118, 83, 46, 0.08) 0%, transparent 25%);
-  border: 1px solid rgba(118, 83, 46, 0.35);
-  border-radius: 3px;
-  box-shadow: 0 2px 12px rgba(16, 11, 8, 0.22), inset 0 0 16px rgba(118, 83, 46, 0.06);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-  overflow: hidden;
-  position: relative;
-}
-
-.artifact-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(16, 11, 8, 0.32);
+  font-weight: 500;
+  color: var(--ink);
 }
 
 /* Timeline line for experience */
@@ -529,16 +553,13 @@ body {
   opacity: 0.6;
 }
 
-* {
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none;     /* IE 10 and Edge */
-  user-select: none;         /* Standard syntax (Chrome, Firefox, Opera) */
-}
+/* Why: a global user-select:none blocked copying text such as the email address.
+   Impact: text is selectable; decorative layers opt out individually (.map-coord-mark). */
 
 /* Page transition area — padding for fixed nav responsive position */
 .page-content {
   padding-top: 24px;
-  padding-bottom: 96px;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom)); /* clears the bottom mobile nav */
   min-height: 100vh;
 }
 
@@ -547,37 +568,6 @@ body {
     padding-top: 90px;
     padding-bottom: 24px;
   }
-}
-
-/* ─── MAP OPENING PAGE TRANSITION ────────────────────────────────────────── */
-
-.page-unfold-container {
-  clip-path: inset(0 50% 0 50%);
-  transition: clip-path 0.85s cubic-bezier(0.25, 1, 0.45, 1);
-  will-change: clip-path;
-  position: relative;
-}
-
-.page-unfold-container.is-unfolded {
-  clip-path: inset(0 0% 0 0%);
-}
-
-/* Vertical center crease shadow simulating a folded parchment opening */
-.page-unfold-container::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 50px;
-  transform: translateX(-50%);
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 4s cubic-bezier(0.25, 1, 0.45, 1);
-}
-
-.page-unfold-container.is-unfolded::before {
-  opacity: 0;
 }
 
 @keyframes mapHeroFadeIn {
@@ -618,107 +608,231 @@ body {
   }
 }
 
-/* ─── COMMAND PALETTE MODAL ───────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   STAGE 2/3 — SHARED PAGE PRIMITIVES
+   Why: pages previously hand-rolled buttons, headers and inputs with inline styles.
+   Impact: one set of buttons/fields/badges so every page shares the same material,
+   sizes and focus behaviour.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-.cmd-palette-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(8, 5, 4, 0.85);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fade-in 0.2s ease-out;
-}
-
-.cmd-palette-box {
-  background-color: var(--parchment-light);
-  background-image:
-    radial-gradient(circle at 20% 25%, rgba(122, 59, 30, 0.07) 0%, transparent 35%),
-    radial-gradient(circle at 80% 75%, rgba(118, 83, 46, 0.09) 0%, transparent 30%);
-  border: 1px solid rgba(118, 83, 46, 0.4);
-  border-radius: 6px;
-  box-shadow:
-    0 25px 50px rgba(16, 11, 8, 0.5),
-    inset 0 0 30px rgba(118, 83, 46, 0.1);
-  width: 90%;
-  max-width: 600px;
-  max-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.cmd-palette-input {
+.page-container {
   width: 100%;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-  padding: 12px 16px !important;
-  font-family: var(--font-handwritten), 'Caveat', cursive !important;
-  font-size: 1.1rem !important;
-  color: var(--ink) !important;
-  caret-color: var(--blood-ink) !important;
-  box-shadow: none !important;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: 1rem;
 }
+@media (min-width: 768px) { .page-container { padding-inline: 2rem; } }
 
-.cmd-palette-input::placeholder {
-  color: rgba(118, 83, 46, 0.4) !important;
-  font-style: italic !important;
-}
-
-.cmd-palette-item {
-  padding: 10px 16px;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  font-family: var(--font-handwritten), 'Caveat', cursive;
+.eyebrow {
+  font-family: var(--font-caveat), cursive;
   font-size: 0.95rem;
-  color: var(--ink-faded);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.15s ease;
-  border-bottom: 1px solid rgba(118, 83, 46, 0.08);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blood-ink);
 }
 
-.cmd-palette-item:last-child {
-  border-bottom: none;
+.section-title {
+  font-family: var(--font-caveat), cursive;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.2;
+  color: var(--leather);
 }
 
-.cmd-palette-item:hover {
-  background-color: rgba(150, 115, 49, 0.15);
+.prose-map {
+  font-family: var(--font-caveat), cursive;
+  font-size: 1.2rem;
+  line-height: 1.5;
   color: var(--ink);
 }
+.prose-map-soft { color: var(--ink-faded); }
 
-.cmd-palette-item.highlighted {
-  background-color: rgba(150, 115, 49, 0.25);
-  color: var(--blood-ink);
-  font-weight: 600;
-  padding-left: 20px;
-}
-
-.cmd-palette-item-icon {
-  display: flex;
+/* Buttons */
+.btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  opacity: 0.7;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.65rem 1.4rem;
+  font-family: var(--font-pirata), 'Times New Roman', serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+@media (hover: hover) { .btn:not(:disabled):hover { transform: translateY(-2px); } }
+
+.btn-primary {
+  background: linear-gradient(180deg, #3b2c20, var(--leather));
+  color: var(--parchment-light);
+  border-color: var(--gold);
+  box-shadow: 0 1px 0 rgba(255, 248, 230, 0.15) inset, 0 6px 14px -6px rgba(48, 37, 29, 0.6);
+}
+.btn-primary:not(:disabled):hover { background: linear-gradient(180deg, #4a382a, #3b2c20); box-shadow: 0 10px 18px -8px rgba(48, 37, 29, 0.65); }
+
+.btn-secondary {
+  background: rgba(150, 115, 49, 0.16);
+  color: var(--leather);
+  border-color: rgba(129, 80, 47, 0.55);
+}
+.btn-secondary:not(:disabled):hover { border-color: var(--gold); background: rgba(150, 115, 49, 0.28); }
+
+.link-quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 32px;
+  font-family: var(--font-caveat), cursive;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink-faded);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.link-quiet:hover { color: var(--blood-ink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Badges (internship / full-time etc.) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-family: var(--font-caveat), cursive;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(129, 80, 47, 0.45);
+  color: var(--ink-faded);
+  background: rgba(182, 154, 112, 0.25);
+}
+.badge-solid { background: var(--blood-ink); border-color: var(--blood-ink); color: var(--parchment-light); }
+
+/* Form fields */
+.field {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0.85rem;
+  font-family: var(--font-caveat), cursive;
+  font-size: 1rem;
+  color: var(--ink);
+  background: rgba(255, 248, 230, 0.55);
+  border: 1px solid rgba(129, 80, 47, 0.45);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 3px rgba(48, 37, 29, 0.12);
+  caret-color: var(--blood-ink);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.field::placeholder { color: rgba(90, 68, 48, 0.6); }
+.field:focus { outline: none; border-color: var(--blood-ink); background: rgba(255, 248, 230, 0.85); box-shadow: inset 0 1px 3px rgba(48, 37, 29, 0.12), var(--focus-ring); }
+.field[aria-invalid="true"] { border-color: var(--blood-ink); }
+.field:disabled { opacity: 0.55; }
+
+/* ─── CHAPTER HEADER ─────────────────────────────────────────────────────── */
+.chapter-header { margin: 0; }
+
+/* ─── PROJECT SHOWCASE ───────────────────────────────────────────────────── */
+.shot-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  border: 1px solid rgba(48, 37, 29, 0.55);
+  background: var(--leather);
+  box-shadow: 0 2px 4px rgba(48, 37, 29, 0.25), 0 10px 22px -10px rgba(48, 37, 29, 0.55);
+}
+.shot-frame img { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+@media (hover: hover) {
+  .project-card:hover .shot-frame img { transform: scale(1.035); }
 }
 
+/* ─── EXPERIENCE ROUTE ───────────────────────────────────────────────────── */
+.route-line {
+  position: absolute;
+  left: 1.25rem;
+  top: 0;
+  bottom: 0;
+  border-left: 2px dashed rgba(104, 29, 24, 0.5);
+}
+@media (min-width: 768px) { .route-line { left: 12.25rem; } }
+
+/* ─── HERO MAP SHEET (subtle 3D) ─────────────────────────────────────────── */
+.tilt-stage { perspective: 1100px; }
+.tilt-card {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.25s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.compass-needle { transform-origin: 50% 50%; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.compass:hover .compass-needle { transform: rotate(38deg); }
+
+/* ─── MOTION (pure CSS, no scroll handlers) ──────────────────────────────────
+   Why: reveals/ink headings add polish without JS observers or blocking content.
+   Impact: gated on no-preference; browsers without scroll-driven animations just show content. */
+@keyframes reveal-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes ink-in { from { clip-path: inset(0 100% 0 0); opacity: 0.2; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-header { animation: ink-in 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── FOOTPRINT DIVIDER + PAGE ENTER ─────────────────────────────────────────
+   Why: subtle map-walk between sections and a gentle page transition.
+   Impact: opacity-only page fade (a transform here would break position:fixed nav/buttons). */
+.footprints { display: flex; justify-content: center; gap: 1.1rem; color: var(--blood-ink); opacity: 0.45; padding: 1rem 0; }
+.footprints svg { width: 14px; height: 26px; }
+.footprints svg:nth-child(odd) { transform: translateY(-5px) rotate(-8deg); }
+.footprints svg:nth-child(even) { transform: translateY(5px) rotate(8deg); }
+@keyframes page-enter { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter { animation: page-enter 0.45s ease-out both; }
+  @supports (animation-timeline: view()) {
+    .footprints svg { animation: reveal-in linear both; animation-timeline: view(); animation-range: entry 0% entry 80%; }
+    .footprints svg:nth-child(2) { animation-range: entry 10% entry 90%; }
+    .footprints svg:nth-child(3) { animation-range: entry 20% entry 100%; }
+    .footprints svg:nth-child(4) { animation-range: entry 30% entry 100%; }
+  }
+}
+
+/* ─── RESUME MODAL ───────────────────────────────────────────────────────── */
+.resume-dialog {
+  margin: auto;
+  width: min(960px, 94vw);
+  height: min(90vh, 1100px);
+  padding: 0;
+  flex-direction: column;
+  background: var(--parchment-light);
+  background-image: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--surface-radius);
+  box-shadow: 0 30px 60px rgba(16, 11, 8, 0.55);
+  overflow: hidden;
+}
+.resume-dialog[open] { display: flex; }
+.resume-dialog::backdrop { background: rgba(16, 11, 8, 0.78); }
+@media (prefers-reduced-motion: no-preference) {
+  .resume-dialog[open] { animation: page-enter 0.25s ease-out; }
+}

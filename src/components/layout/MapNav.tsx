@@ -2,14 +2,15 @@ import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { LOCATION } from "@/src/lib/location";
 import { Compass, Scroll, Swords, Trophy, Feather, Eye, EyeOff } from "lucide-react";
 
 const NAV_LOCATIONS = [
-  { id: "home", label: "Home", icon: <Compass className="w-5 h-5 text-ink-faded" />, route: "/" },
-  { id: "about", label: "About", icon: <Scroll className="w-5 h-5 text-ink-faded" />, route: "/about" },
-  { id: "experience", label: "Experience", icon: <Swords className="w-5 h-5 text-ink-faded" />, route: "/experience" },
-  { id: "projects", label: "Projects", icon: <Trophy className="w-5 h-5 text-ink-faded" />, route: "/projects" },
-  { id: "contact", label: "Contact", icon: <Feather className="w-5 h-5 text-ink-faded" />, route: "/contact" },
+  { id: "home", label: "Home", icon: <Compass className="w-5 h-5" />, route: "/" },
+  { id: "about", label: "About", icon: <Scroll className="w-5 h-5" />, route: "/about" },
+  { id: "experience", label: "Experience", icon: <Swords className="w-5 h-5" />, route: "/experience" },
+  { id: "projects", label: "Projects", icon: <Trophy className="w-5 h-5" />, route: "/projects" },
+  { id: "contact", label: "Contact", icon: <Feather className="w-5 h-5" />, route: "/contact" },
 ];
 
 export default function MapNav() {
@@ -55,17 +56,17 @@ export default function MapNav() {
     return () => window.removeEventListener("resize", compute);
   }, []);
 
-  const [serpentEnabled, setSerpentEnabled] = useState<boolean>(true);
+  const [dragonEnabled, setDragonEnabled] = useState<boolean>(true);
 
   useEffect(() => {
-    setSerpentEnabled(localStorage.getItem("serpent_enabled") !== "false");
+    setDragonEnabled(localStorage.getItem("dragon_enabled") !== "false");
   }, []);
 
-  const toggleSerpent = () => {
-    const next = !serpentEnabled;
-    setSerpentEnabled(next);
-    localStorage.setItem("serpent_enabled", String(next));
-    window.dispatchEvent(new CustomEvent("toggle-serpent", { detail: { enabled: next } }));
+  const toggleDragon = () => {
+    const next = !dragonEnabled;
+    setDragonEnabled(next);
+    localStorage.setItem("dragon_enabled", String(next));
+    window.dispatchEvent(new CustomEvent("toggle-dragon", { detail: { enabled: next } }));
   };
 
   const getActiveId = () => {
@@ -80,26 +81,27 @@ export default function MapNav() {
   return (
     <nav className="map-nav" aria-label="Main navigation">
       {/* Coordinate decorations — map flavour only */}
-      <div className="absolute top-2 left-3 map-coord-mark hidden md:block">
-        19°04′N · 72°51′E
+      <div className="absolute top-2 left-3 map-coord-mark hidden lg:block">
+        {LOCATION.lat} · {LOCATION.lon}
       </div>
       
-      {/* Top right header: Ved Patil + Serpent toggle button */}
-      <div className="absolute top-1.5 right-3 flex items-center gap-3 z-20">
+      {/* Top right header: Ved Patil + Dragon toggle button */}
+      {/* Why: the dragon is disabled on touch devices and this control overlapped the mobile bottom nav. Impact: shown from lg up only (at tablet widths it collided with the Contact icon). */}
+      <div className="absolute top-1.5 right-3 hidden lg:flex items-center gap-3 z-20">
         <span className="map-coord-mark hidden md:inline">Ved Patil</span>
         <button
-          onClick={toggleSerpent}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-parchment-dark/40 hover:border-gold text-xs font-handwritten text-ink-faded hover:text-blood-ink transition-all cursor-pointer bg-parchment-light/70 shadow-xs"
-          title={serpentEnabled ? "Turn off Cursor Serpent" : "Turn on Cursor Serpent"}
-          aria-label={serpentEnabled ? "Turn off Cursor Serpent" : "Turn on Cursor Serpent"}
+          onClick={toggleDragon}
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-parchment-dark/40 hover:border-gold text-xs font-sans text-ink-faded hover:text-blood-ink transition-all cursor-pointer bg-parchment-light/70 shadow-xs"
+          title={dragonEnabled ? "Turn off Cursor Dragon" : "Turn on Cursor Dragon"}
+          aria-label={dragonEnabled ? "Turn off Cursor Dragon" : "Turn on Cursor Dragon"}
         >
-          {serpentEnabled ? (
+          {dragonEnabled ? (
             <Eye className="w-3.5 h-3.5 shrink-0 text-blood-ink" />
           ) : (
             <EyeOff className="w-3.5 h-3.5 shrink-0 text-ink-faded opacity-60" />
           )}
           <span className="font-bold text-[11px] uppercase tracking-wider">
-            {serpentEnabled ? "Serpent: ON" : "Serpent: OFF"}
+            {dragonEnabled ? "Dragon: ON" : "Dragon: OFF"}
           </span>
         </button>
       </div>
@@ -144,7 +146,7 @@ export default function MapNav() {
             <div ref={(el) => { iconRefs.current[i] = el; }} className="nav-location-icon relative" aria-hidden="true">
               {loc.icon}
               {activeId === loc.id && (
-                <span className="absolute -top-1.5 -right-1.5 text-[10px] text-blood-ink font-bold font-display select-none bg-parchment-light px-0.5 rounded border border-parchment-dark/30 leading-none shadow-sm">
+                <span className="absolute -top-2 -right-2 text-xs text-blood-ink font-bold font-display select-none bg-parchment-light w-4 h-4 flex items-center justify-center rounded-full border border-blood-ink/50 leading-none shadow-sm">
                   X
                 </span>
               )}

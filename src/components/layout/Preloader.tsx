@@ -3,51 +3,40 @@
 import React, { useEffect, useState } from "react";
 import ThemeLogo from "./ThemeLogo";
 
+// Why: the preloader was a fixed 2s timer that delayed every visit without any real loading behind it.
+// Impact: it now renders nothing unless the page is genuinely still loading after SHOW_AFTER_MS, and it
+// disappears the moment the window `load` event fires. Fast loads (the normal case) never see it.
+const SHOW_AFTER_MS = 600;
+
 export default function Preloader() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [fade, setFade] = useState(false);
-  const [message, setMessage] = useState("Holding the wand...");
 
   useEffect(() => {
-    const messages = [
-      "Holding the wand...",
-      "Unfolding the parchment...",
-      "Drawing secret pathways...",
-      "Revealing the castle...",
-      "I solemnly swear that I am up to no good..."
-    ];
+    if (document.readyState === "complete") return;
 
-    let msgIndex = 0;
-    const interval = setInterval(() => {
-      msgIndex++;
-      if (msgIndex < messages.length) {
-        setMessage(messages[msgIndex]);
-      }
-    }, 300);
-
-    // Why: exitTimer lives in effect scope so cleanup can clear it on unmount
-    // (a cleanup returned from inside a timeout callback never runs).
-    // Minimum preloader time of 2s before fading out.
     let exitTimer: ReturnType<typeof setTimeout>;
-    const timer = setTimeout(() => {
+    const showTimer = setTimeout(() => setLoading(true), SHOW_AFTER_MS);
+    const onLoad = () => {
+      clearTimeout(showTimer);
       setFade(true);
-      exitTimer = setTimeout(() => {
-        setLoading(false);
-      }, 700); // matches fade-out transition duration
-    }, 2000);
+      exitTimer = setTimeout(() => setLoading(false), 400);
+    };
+    window.addEventListener("load", onLoad, { once: true });
 
     return () => {
-      clearInterval(interval);
-      clearTimeout(timer);
+      clearTimeout(showTimer);
       clearTimeout(exitTimer);
+      window.removeEventListener("load", onLoad);
     };
   }, []);
 
   if (!loading) return null;
+  const message = "Unfolding the parchment...";
 
   return (
     <div
-      className={`fixed inset-0 z-9999 flex flex-col items-center justify-center select-none transition-opacity duration-700 ease-in-out ${
+      className={`fixed inset-0 z-9999 flex flex-col items-center justify-center select-none transition-opacity duration-300 ease-in-out ${
         fade ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
       style={{

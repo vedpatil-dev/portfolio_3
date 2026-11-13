@@ -447,8 +447,8 @@
 @media (max-width: 820px) {
   .diary-book-3d {
     max-width: 100% !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
     transform: none !important;
     perspective: none !important;
     transform-style: flat !important;
@@ -471,7 +471,7 @@
   .diary-page-sheet {
     position: relative !important;
     width: 100% !important;
-    height: 100vh !important;
+    height: 100dvh !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
@@ -502,3 +502,21 @@
     display: none !important;
   }
 }
+
+/* Why: diary actions (Back / Open page / Skip / suggestions) were tiny dashed text. Impact: clear, 36px-tall
+   handwritten chips with hover and keyboard-focus states. */
+.diary-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 2px 12px;
+  font-family: var(--font-handwritten), cursive;
+  font-size: 1.1rem;
+  color: var(--ink);
+  background: rgba(150, 115, 49, 0.14);
+  border: 1px solid rgba(118, 83, 46, 0.45);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.diary-chip:hover { background: rgba(150, 115, 49, 0.28); border-color: var(--gold); color: var(--blood-ink); }

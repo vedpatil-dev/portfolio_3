@@ -1,12 +1,7 @@
-import Link from "next/link";
 import MapShell from "@/src/components/layout/MapShell";
+import ChapterHeader from "@/src/components/layout/ChapterHeader";
+import ProjectCard from "@/src/components/projects/ProjectCard";
 import projectsData from "@/src/data/content/projects.json";
-import { ExternalLink, ArrowRight } from "lucide-react";
-import { FaGithub as Github } from "react-icons/fa";
-import InteractiveParagraph from "@/src/components/text/InteractiveParagraph";
-
-type Project = typeof projectsData.projects[0];
-
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,116 +14,26 @@ export const metadata: Metadata = {
 };
 
 export default function ProjectsPage() {
+  const projects = projectsData.projects;
 
   return (
     <MapShell>
-      <section className="map-section px-4 py-4 animate-map-fade-in" aria-labelledby="projects-title">
-        <div className="max-w-7xl w-full mx-auto space-y-10">
+      <section className="page-container pb-12" aria-labelledby="projects-title">
+        <ChapterHeader
+          id="projects-title"
+          chapter="Chapter III"
+          title="The Workshop"
+          subtitle="Things I've built — and the stories behind them"
+        />
 
-          {/* Chapter header */}
-          <div className="text-center">
-            <p className="chapter-number">
-              Chapter IV
-            </p>
-            <h1 id="projects-title" className="chapter-header text-3xl md:text-4xl">
-              Projects
-            </h1>
-            <div className="chapter-divider w-48 mx-auto mt-2" />
-            <div className="mt-2 flex justify-center w-full">
-              <InteractiveParagraph
-                text="Things I've built — and the stories behind them"
-                fontClass="font-handwritten text-base text-ink-faded italic text-center"
-                fontSpec="16px Caveat, cursive"
-                lineHeight={22}
-              />
+        {/* Why: Pinterest-style masonry via CSS columns — tiles keep their natural screenshot proportions and
+            flow into 1/2/3 columns with no JS layout. Impact: break-inside-avoid keeps each card whole. */}
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-5 md:gap-6 mt-8">
+          {projects.map((project, i) => (
+            <div key={project.id} className="reveal break-inside-avoid mb-5 md:mb-6">
+              <ProjectCard project={project} index={i} priority={i < 3} />
             </div>
-          </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projectsData.projects.map((project, i) => (
-                <article key={project.id} className="artifact-card flex flex-col">
-                  {/* Project image */}
-                  <div
-                    className="relative overflow-hidden"
-                    style={{ height: 160, background: "rgba(155,118,65,0.25)" }}
-                  >
-                    <img
-                      src={project.image}
-                      alt={`${project.name} preview`}
-                      className="w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity duration-500"
-                      loading={i < 3 ? "eager" : "lazy"}
-                    />
-                    <div className="absolute top-2 left-3 font-handwritten text-xs text-ink-faded opacity-60">
-                      № {String(i + 1).padStart(2, "0")}
-                    </div>
-                  </div>
-
-                  {/* Card content */}
-                  <div className="flex flex-col flex-1 p-4 space-y-2">
-                    <h2 className="font-display text-lg text-leather font-bold leading-tight">
-                      {project.name}
-                    </h2>
-                    <p className="font-serif text-sm text-ink-faded leading-relaxed flex-1">
-                      {project.summary}
-                    </p>
-
-                    {/* Tech tags */}
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {project.techStack.slice(0, 4).map((t, ti) => (
-                        <span key={ti} className="skill-tag">{t}</span>
-                      ))}
-                      {project.techStack.length > 4 && (
-                        <span className="skill-tag opacity-60">+{project.techStack.length - 4}</span>
-                      )}
-                    </div>
-
-                    {/* Action row */}
-                    <div className="flex items-center justify-between pt-3 border-t border-parchment-dark/20">
-                      <div className="flex items-center gap-3">
-                        {project.gitLink && (
-                          <a
-                            href={project.gitLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 font-handwritten text-xs text-ink-faded hover:text-leather transition-colors"
-                            aria-label={`${project.name} GitHub`}
-                          >
-                            <Github className="w-3.5 h-3.5 shrink-0" />
-                            <span>GitHub</span>
-                          </a>
-                        )}
-                        {project.demoLink && (
-                          <a
-                            href={project.demoLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 font-handwritten text-xs text-ink-faded hover:text-leather transition-colors"
-                            aria-label={`${project.name} live demo`}
-                          >
-                            <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                            <span>Live Demo</span>
-                          </a>
-                        )}
-                      </div>
-                      <Link
-                        href={`/projects/${project.slug}`}
-                        className="font-display text-xs text-blood-ink hover:text-leather hover:underline tracking-wider uppercase transition-colors flex items-center gap-0.5"
-                      >
-                        <span>Details</span>
-                        <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-          {/* Footer */}
-          <div className="text-center pt-4">
-            <p className="font-handwritten text-base text-blood-ink/60 italic">
-              ~ Built with focus, curiosity, and too much coffee. ~
-            </p>
-          </div>
-
+          ))}
         </div>
       </section>
     </MapShell>

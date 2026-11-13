@@ -71,7 +71,7 @@ export default function DiaryInput({
       {/* Visual Overlay of Hand-drawn Ink Letter Blooms */}
       <div className="w-full h-full font-handwritten text-2xl text-ink leading-[28px] flex flex-wrap content-start pt-1 relative">
         {value.length === 0 && (
-          <span className="absolute left-0 top-1 text-[rgba(118,83,46,0.25)] italic text-xl select-none pointer-events-none">
+          <span className="absolute left-0 top-1 text-[rgba(89,64,43,0.65)] italic text-xl select-none pointer-events-none">
             {placeholder}
           </span>
         )}

@@ -7,6 +7,7 @@ import projectsData from "@/src/data/content/projects.json";
 import experienceData from "@/src/data/content/experience.json";
 import skillsData from "@/src/data/content/skills.json";
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import "./diary.css";
 import { COMMANDS } from "@/src/lib/navigationCommands";
 
@@ -17,6 +18,7 @@ interface DiaryProps {
 
 export default function Diary({ open, onClose }: DiaryProps) {
   const { phase, transitionTo } = useDiaryMachine("closed");
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const overlayRef = useRef<HTMLDivElement>(null);
   const [answer, setAnswer] = useState<any | null>(null);
@@ -58,7 +60,11 @@ export default function Diary({ open, onClose }: DiaryProps) {
   // Submit query search matching logic
   const handleSearchSubmit = useCallback(
     (selectedCmd?: any) => {
-      const targetCmd = selectedCmd || (filtered[highlighted] && query.trim() ? filtered[highlighted] : null);
+      // Why: suggestion chips search for plain text without a matching command. Impact: `{ rawQuery }` runs the normal
+      // text search with that term (the `query` state is not updated yet when the chip fires).
+      const rawQuery: string | undefined = selectedCmd?.rawQuery;
+      const searchText = (rawQuery ?? query).trim();
+      const targetCmd = rawQuery ? null : selectedCmd || (filtered[highlighted] && query.trim() ? filtered[highlighted] : null);
 
       if (targetCmd) {
         // Direct shortcuts
@@ -93,7 +99,7 @@ export default function Diary({ open, onClose }: DiaryProps) {
         }
       } else {
         // Arbitrary textual search matching
-        const q = query.trim().toLowerCase();
+        const q = searchText.toLowerCase();
         if (!q) return;
 
         // Check for direct word matching first for native sections
@@ -130,7 +136,7 @@ export default function Diary({ open, onClose }: DiaryProps) {
 
           if (matchedProjects.length > 0 || matchedExperiences.length > 0 || matchedSkills.length > 0) {
             setAnswer({
-              title: `Search matches for "${query}"`,
+              title: `Search matches for "${searchText}"`,
               type: "search_results",
               results: {
                 projects: matchedProjects,
@@ -142,7 +148,7 @@ export default function Diary({ open, onClose }: DiaryProps) {
             setAnswer({
               title: "Ved's thoughts remain blank...",
               type: "custom_text",
-              content: `I searched my memories for "${query}", but found no records. Try asking about skills like "React", "Spring Boot", or projects like "FundDev".`,
+              content: `I searched my memories for "${searchText}", but found no records. Try asking about skills like "React", "Spring Boot", or projects like "FundDev".`,
             });
           }
         }
@@ -190,6 +196,7 @@ export default function Diary({ open, onClose }: DiaryProps) {
       className={`diary-overlay${phase !== "closed" ? " active" : ""}`}
       role="dialog"
       aria-modal="true"
+      aria-label="Ved's Diary — search my work"
       aria-hidden={phase === "closed"}
       inert={phase === "closed"}
       onClick={(e) => {
@@ -221,6 +228,11 @@ export default function Diary({ open, onClose }: DiaryProps) {
           setHighlighted={setHighlighted}
           handleKeyDown={handleKeyDown}
           overlayRef={overlayRef}
+          // Why: answers had no way to reach the real page. Impact: "Open page" navigates there and closes the diary.
+          onOpenPage={(route: string) => {
+            router.push(route);
+            handleCloseTrigger();
+          }}
         />
       </div>
     </div>

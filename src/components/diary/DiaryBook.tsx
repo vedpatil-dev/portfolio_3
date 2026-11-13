@@ -27,7 +27,11 @@ interface DiaryBookProps {
   setHighlighted: (idx: number) => void;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   overlayRef: React.RefObject<HTMLDivElement | null>;
+  onOpenPage: (route: string) => void;
 }
+
+// Example searches shown as chips (all exist in the site data: skills / project stacks).
+const SUGGESTIONS = ["React", "Spring Boot", "PostgreSQL", "Docker", "Projects", "Contact"];
 
 export default function DiaryBook({
   phase,
@@ -43,6 +47,7 @@ export default function DiaryBook({
   setHighlighted,
   handleKeyDown,
   overlayRef,
+  onOpenPage,
 }: DiaryBookProps) {
   // DOM Refs for GSAP
   const bookRef = useRef<HTMLDivElement>(null);
@@ -96,6 +101,26 @@ export default function DiaryBook({
       pageTurnCallbackRef.current = null;
     }
   }, [phase]);
+
+  // Why: the greeting animation blocked the search box for ~8s with no way out. Impact: any key press or click during the
+  // greeting skips straight to the search page (timers cleared so nothing fires twice).
+  useEffect(() => {
+    if (phase !== "writing") return;
+    const skip = () => {
+      if (greetingFadeTimeoutRef.current) clearTimeout(greetingFadeTimeoutRef.current);
+      if (greetingWaitingTimeoutRef.current) clearTimeout(greetingWaitingTimeoutRef.current);
+      greetingFadeTimeoutRef.current = null;
+      greetingWaitingTimeoutRef.current = null;
+      setGreetingFading(false);
+      transitionTo("waiting");
+    };
+    window.addEventListener("keydown", skip);
+    window.addEventListener("pointerdown", skip);
+    return () => {
+      window.removeEventListener("keydown", skip);
+      window.removeEventListener("pointerdown", skip);
+    };
+  }, [phase, transitionTo]);
 
   // Initialize GSAP orchestration hook
   useDiaryAnimation({
@@ -153,9 +178,9 @@ export default function DiaryBook({
           triggerPageTurn("forward", () => {
             onSubmit(ans);
           });
-        }, 550);
+        }, 300);
       }
-    }, 45); // Elegant typing speed
+    }, 28); // Elegant typing speed (was 45ms/char — felt slow)
   };
 
   const handleReturnToIndex = () => {
@@ -186,8 +211,8 @@ export default function DiaryBook({
         >
           <DiaryWriter
             text={diaryConfig.greeting}
-            speed={60}
-            delay={1500}
+            speed={45}
+            delay={400}
             fontClass="diary-ink-text font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-normal"
             center={true}
             onComplete={() => {
@@ -196,15 +221,15 @@ export default function DiaryBook({
               greetingFadeTimeoutRef.current = setTimeout(() => {
                 greetingFadeTimeoutRef.current = null;
                 setGreetingFading(true);
-              }, 2500);
+              }, 1200);
 
-              // Wait 3.5s total (1s after fade starts), then transition to waiting
+              // Wait 2.2s total (1s after fade starts), then transition to waiting
               if (greetingWaitingTimeoutRef.current) clearTimeout(greetingWaitingTimeoutRef.current);
               greetingWaitingTimeoutRef.current = setTimeout(() => {
                 greetingWaitingTimeoutRef.current = null;
                 transitionTo("waiting");
                 setGreetingFading(false);
-              }, 3500);
+              }, 2200);
             }}
           />
         </div>
@@ -229,7 +254,7 @@ export default function DiaryBook({
               transitionTo("thinking");
               setTimeout(() => {
                 onSubmit();
-              }, 1000); // 1s thinking delay
+              }, 450); // brief thinking delay (was 1s)
             }
           }}
           placeholder="Ask a question, or search my memories..."
@@ -255,6 +280,24 @@ export default function DiaryBook({
                 <span>{cmd.label}</span>
               </button>
             ))}
+          </div>
+        )}
+
+        {/* Why: the left page was an empty ruled sheet, so people did not know what to ask.
+            Impact: one-tap example searches plus a keyboard hint; hidden once the visitor starts typing. */}
+        {(phase === "waiting" || phase === "answer") && query.trim().length === 0 && (
+          <div className="absolute bottom-3 left-0 right-0 space-y-3">
+            <p className="font-handwritten text-lg text-ink-faded">Try asking about:</p>
+            <div className="flex flex-wrap gap-2">
+              {SUGGESTIONS.map((term) => (
+                <button key={term} type="button" className="diary-chip" onClick={() => handleSelectAnswer({ label: term, rawQuery: term })}>
+                  {term}
+                </button>
+              ))}
+            </div>
+            <p className="hidden md:block font-handwritten text-base text-ink-faded">
+              ↑ ↓ choose · Enter open · Esc close
+            </p>
           </div>
         )}
       </div>
@@ -295,7 +338,7 @@ export default function DiaryBook({
     }
 
     if (answer) {
-      return <DiaryAnswer answer={answer} onBack={handleReturnToIndex} />;
+      return <DiaryAnswer answer={answer} onBack={handleReturnToIndex} onOpenPage={onOpenPage} />;
     }
 
     // Default right-page Index
@@ -349,7 +392,7 @@ export default function DiaryBook({
           </div>
         </div>
 
-        <div className="font-handwritten text-xs text-ink-faded/45 text-center mt-4">
+        <div className="font-handwritten text-sm text-ink-faded text-center mt-4">
           Ved Patil&apos;s Diary © 2026
         </div>
       </div>

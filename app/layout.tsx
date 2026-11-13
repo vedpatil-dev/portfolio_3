@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Caveat, Pirata_One } from "next/font/google";
 import "./globals.css";
-import CursorSerpent from "@/src/components/effects/CursorSerpent";
+import CursorDragon from "@/src/components/effects/CursorDragon";
 import Preloader from "@/src/components/layout/Preloader";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -63,12 +63,17 @@ export const metadata: Metadata = {
     description:
       "Ved Patil is a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL. Explore his projects, experience, and software development work.",
     siteName: "Ved Patil Portfolio",
+    // Why: link previews had no image. Impact: the shared-link card uses the dragon hero screenshot (800x600).
+    images: [
+      { url: "/og-image.png", width: 800, height: 600, alt: "Ved Patil — Full Stack Developer portfolio with the map dragon" },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Ved Patil | Full Stack Developer",
     description:
       "Ved Patil is a Full Stack Developer specializing in React, Next.js, Java, Spring Boot, and PostgreSQL.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -144,12 +149,13 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex flex-col unselectable">
+      {/* Why: the unselectable class blocked copying text (e.g. the email address). Impact: text is selectable again. */}
+      <body className="flex flex-col">
         <Preloader />
         {children}
         <Analytics />
         <SpeedInsights />
-        <CursorSerpent />
+        <CursorDragon />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
